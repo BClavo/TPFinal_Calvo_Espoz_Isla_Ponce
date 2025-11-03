@@ -7,7 +7,7 @@ pygame.init() # Inicia todo los modulos de pygame
 screen_ancho, screen_alto = 576,1024 
 screen=pygame.display.set_mode((screen_ancho,screen_alto)) # Crea la ventana ancho/alto
 
-bg_image = pygame.image.load('bg_night.png')
+bg_image = pygame.image.load('sprites/bg_night.png')
 # Scale the image to fit the screen (if necessary)
 bg_image = pygame.transform.scale(bg_image, (screen_ancho, screen_alto))
 
