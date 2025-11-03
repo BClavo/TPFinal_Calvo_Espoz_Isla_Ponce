@@ -2,7 +2,23 @@ import random
 import numpy as np
 import json
 
-with open(config.json)
+with open("config.json") as f:
+    config = json.load(f)
+    HEIGHT = config["HEIGHT"]
+    WIDTH = config["WIDTH"]
+    PANEL_WIDTH = config["PANEL_WIDTH"]
+    GAME_WIDTH = config["GAME_WIDTH"]
+    FPS = config["FPS"]
+    MAX_TIME = config["MAX_TIME"]
+    GRAVITY = config["GRAVITY"]
+    FLAP_STRENGTH = config["FLAP_STRENGTH"]
+    PIPE_WIDTH = config["PIPE_WIDTH"]
+    PIPE_GAP = config["PIPE_GAP"]
+    MIN_PIPE_GAP = config["MIN_PIPE_GAP"]
+    PIPE_SPEED = config["PIPE_SPEED"]
+    BIRD_SIZE = config["BIRD_SIZE"]
+
+
 
 
 
