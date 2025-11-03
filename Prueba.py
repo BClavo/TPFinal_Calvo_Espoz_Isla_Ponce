@@ -1,5 +1,10 @@
 import random
 import numpy as np
+import json
+
+with open(config.json)
+
+
 
 class Pajaro:
     def __init__(self,genes=None):
