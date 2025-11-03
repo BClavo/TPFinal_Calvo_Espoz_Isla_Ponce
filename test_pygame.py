@@ -2,7 +2,6 @@
 import pygame
 
 
-
 # pygame setup
 pygame.init() # Inicia todo los modulos de pygame
 screen_ancho, screen_alto = 576,1024 
@@ -16,6 +15,7 @@ bg_image = pygame.transform.scale(bg_image, (screen_ancho, screen_alto))
 pygame.display.set_caption("Testeo") # Le pone nombre a la ventana
 clock = pygame.time.Clock()
 player = pygame.Rect((300,250,50,50))
+
 
 run = True
 while run:
@@ -38,7 +38,7 @@ while run:
     for event in pygame.event.get(): # Event, las distintas cosas que pueden pasar
         if event.type == pygame.QUIT:
             run = False
-        if event.type 
+    
 
       # flip() the display pone a ver las cosas
     pygame.display.flip() # Toda la pantalla
