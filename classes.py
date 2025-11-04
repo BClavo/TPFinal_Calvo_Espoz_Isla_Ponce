@@ -1,14 +1,25 @@
-class Pajarito:
-    def __init__ (self,tamaño=30,fuerza_aleteo=-10):
-        self.tamaño=tamaño
-        self.fuerza_aleteo=fuerza_aleteo
+import random
+
+
+# class Pajarito:
+#     def __init__ (self,tamaño=30,fuerza_aleteo=-10):
+#         self.tamaño=tamaño
+#         self.fuerza_aleteo=fuerza_aleteo
     
 class Tuberia:
-    def __init__(self,ancho=70,gap=200,min_gap=150,velocidad=6):
+    def __init__(self, x, ancho=70, gap=200, min_gap=150, velocidad=6):
+        self.x = x
+        self.y=random.randit(100, 400)  # altura del hueco
+
         self.ancho=ancho
         self.gap=gap
         self.min_gap=min_gap
         self.vel=velocidad
+    def mover(self):
+        self.x -= self.vel
+    def fuera_de_pantalla(self):
+        return self.x + self.ancho < 0
+
 
 # class Fondo:
 #     def __init__(self,ancho,alto):
@@ -19,8 +30,6 @@ class Juego:
         self.fps=fps
         self.tiempo_max=tiempo_max
         self.gravedad=gravedad
-    
-
 
 
 
