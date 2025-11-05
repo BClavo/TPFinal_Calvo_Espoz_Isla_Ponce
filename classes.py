@@ -1,5 +1,7 @@
 import random
-
+import os
+import pygame
+import time
 
 # class Pajarito:
 #     def __init__ (self,tamaño=30,fuerza_aleteo=-10):
