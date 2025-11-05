@@ -20,9 +20,22 @@ with open("config.json") as f:
 
 
 
+class Pipe:
+    def __init__(self, x_incial): # }
+        self.x = x_incial         # } HAy que sacar al x inicial como argumento, y ponerlo como algo fijo
+        self.width = WIDTH
+        self.speed = PIPE_SPEED
+
+        self.gap = PIPE_GAP
+        self.y_gap = random.randint(self.gap, HEIGHT - self.gap) #El hueco de la tubería se forma dentro de este rango, para respetar siempre el mismo tamaño
+
+    def advance(self):
+        self.x -= PIPE_SPEED
 
 
-class Pajaro:
+
+
+class Bird:
     def __init__(self,genes=None):
         if genes == None:
             self.genes = [random.uniform(-1,1) for _ in range(0,6)] #Genera los genes de forma aleatoria, representados como vectores de 6 elementos.
@@ -32,18 +45,18 @@ class Pajaro:
         #self.y = altura_de_la pantalla // 2 #El pajaro se inicia en la mitad de la pantalla.
         self.vy = 0 #Velocidad para subir y bajar
         self.x = 0
-        self.vivo = True
+        self.alive = True
 
     def decision_aleteo(self, delta_y, delta_x):
         w0,w1,w2,w3,w4,w5 = self.genes
-        valor = w0 + w1*delta_y + w2*(delta_y**2)+w3*delta_x+w4*(delta_x**2) + w5 * self.vy
-        return valor > 0 #Si es menor a cero no aletea, si es mayor a 0 aletea.
+        value = w0 + w1*delta_y + w2*(delta_y**2)+w3*delta_x+w4*(delta_x**2) + w5 * self.vy
+        return value > 0 #Si es menor a cero no aletea, si es mayor a 0 aletea.
     
-    def volar(self,fuerza_de_aleteo = -10):
+    def fly(self,fuerza_de_aleteo = -10):
         self.vy = fuerza_de_aleteo
 
-    def actualizar_posicion(self, delta_y, delta_x, aleteo, gravedad = 0.5):
-        self.vy += gravedad
+    def actualizar_posicion(self, delta_y, delta_x, aleteo):
+        self.vy += GRAVITY
         self.y = self.vy
 
         # # Chequear límites de pantalla
@@ -52,10 +65,16 @@ class Pajaro:
 
 
         # <========== CASO DE COLISIONES ===============>
+    def verify_collision(self, pipe):
+        if pipe.x < self.x + BIRD_SIZE and pipe.x + PIPE_WIDTH > self.x: # Verifica si hay superposicion en X, lo que permite una salida rapida si el pajaro no esta cerca d ela tuberia.
+            if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2: #Verifica si hay un choque con la tuberia superior o inferior.
+                self.alive = False
 
 
 
-#
+
+
+
 
 
 
