@@ -74,9 +74,11 @@ while run:
             run = False
         elif event.type == NUEVA_TUBERIA:
                         # Centro vertical del hueco (entre tuberías)
-            centro_gap = random.randint(150, HEIGHT - 150)
+            MARGEN_VERTICAL = 150
+            centro_gap = random.randint(MARGEN_VERTICAL, HEIGHT - MARGEN_VERTICAL)
 
             # Posición de cada tubería
+    
             PIPE_HEIGHT=500
             y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT
             y_bottom = centro_gap + PIPE_GAP // 2
