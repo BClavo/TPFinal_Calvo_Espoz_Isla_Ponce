@@ -1,7 +1,36 @@
 import random
-import os
+# import os
 import pygame
-import time
+# import time
+import json
+
+with open("config.json") as f:
+    config = json.load(f)
+    HEIGHT = config["HEIGHT"]
+    WIDTH = config["WIDTH"]
+    PANEL_WIDTH = config["PANEL_WIDTH"]
+    GAME_WIDTH = config["GAME_WIDTH"]
+    FPS = config["FPS"]
+    MAX_TIME = config["MAX_TIME"]
+    GRAVITY = config["GRAVITY"]
+    FLAP_STRENGTH = config["FLAP_STRENGTH"]
+    PIPE_WIDTH = config["PIPE_WIDTH"]
+    PIPE_GAP = config["PIPE_GAP"]
+    MIN_PIPE_GAP = config["MIN_PIPE_GAP"]
+    PIPE_SPEED = config["PIPE_SPEED"]
+    BIRD_SIZE = config["BIRD_SIZE"]
+
+
+fondo = pygame.image.load('sprites/bg.png')
+base = pygame.image.load('sprites/base')
+imagen_pajarito = pygame.image.load('sprites/bird1.png')
+imagen_pajarito = pygame.transform.scale(imagen_pajarito, (30))
+top_pipe_image = pygame.image.load('sprites/toppipe.png')
+top_pipe_image = pygame.transform.scale(top_pipe_image, (PIPE_WIDTH, 20))
+bottom_pipe_image = pygame.image.load('sprite/bottompipe.png')
+bottom_pipe_image = pygame.transform.scale(bottom_pipe_image, (PIPE_WIDTH, 20))
+
+
 
 # class Pajarito:
 #     def __init__ (self,tamaño=30,fuerza_aleteo=-10):
