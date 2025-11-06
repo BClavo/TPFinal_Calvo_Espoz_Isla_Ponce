@@ -32,8 +32,9 @@ bottom_pipe_image = pygame.transform.scale(bottom_pipe_image, (PIPE_WIDTH, HEIGH
 
 # --- CLASES ---
 
-class Bird:
+class Bird(pygame.sprite.Sprite):
     def __init__(self, genes=None):
+        super().__init__()
         if genes is None:
             # Genera los genes de forma aleatoria (6 pesos)
             self.genes = np.random.uniform(-1, 1, 6)
