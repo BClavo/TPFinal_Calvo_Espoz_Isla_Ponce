@@ -26,7 +26,7 @@ pygame.init() # Inicia todo los modulos de pygame
 screen_ancho, screen_alto = GAME_WIDTH,600
 screen=pygame.display.set_mode((screen_ancho,screen_alto)) # Crea la ventana ancho/alto
 
-bg_image = pygame.image.load('sprites/bg.png')
+bg_image = pygame.image.load('sprites/bg_dia.png')
 bg_x = 0
 bg_speed = 2  # velocidad del fondo
 

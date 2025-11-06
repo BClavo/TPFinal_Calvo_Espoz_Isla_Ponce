@@ -81,10 +81,10 @@ class Tuberia:
 
 
 class Juego:
-    def __init__(self, ancho, fps, tiempo_max, gravedad):
-        self.ancho = ancho
-        self.fps = fps
-        self.tiempo_max = tiempo_max
-        self.gravedad = gravedad
+    def __init__(self):
+        self.ancho = GAME_WIDTH
+        self.fps = FPS
+        self.tiempo_max = MAX_TIME
+        self.gravedad = GRAVITY
 
 
