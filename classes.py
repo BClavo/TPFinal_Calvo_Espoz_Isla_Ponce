@@ -36,7 +36,7 @@ class Bird:
     def __init__(self, genes=None):
         if genes is None:
             # Genera los genes de forma aleatoria (6 pesos)
-            self.genes = [random.uniform(-1, 1) for _ in range(6)]
+            self.genes = np.array([random.uniform(-1, 1) for _ in range(6)])
         else:
             self.genes = genes
 
@@ -62,6 +62,7 @@ class Bird:
         self.distance += 1
     
     def calcular_fitness(self):
+        # Calcula la distancia neta recorrida por el pajaro 
         self.fitness = (self.distance/FPS) * PIPE_SPEED
 
     def verify_collision(self, pipe):
@@ -70,7 +71,7 @@ class Bird:
             # Verifica choque con tuberías superior o inferior
             if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2:
                 self.alive = False
-        # Verifica 
+        # Verifica que el pajaro no salga del mapa 
         elif self.y < 0 or self.y > HEIGHT:
             self.alive = False
 
@@ -79,10 +80,33 @@ class Poblacion:
     def __init__(self,poblacion):
         self.poblacion = poblacion 
         self.fitnesses = np.array([b.fitness for b in self.poblacion])
+
     def seleccion_por_torneo(self,k=3):
         participantes_idx = np.random.choice(len(self.poblacion),k,replace=False)
         mejor_idx = participantes_idx[np.argmax(self.fitnesses[participantes_idx])]
-        return self.poblacion[mejor_idx]
+        ganador = self.poblacion[mejor_idx]
+        return ganador
+    
+    def seleccion_elitista(self,n_elite=2):
+        # Ordena índices del fitness de mayor a menor
+        idx_ordenados = np.argsort(self.fitnesses)[::-1]
+        # Selecciona los idx de los n mejores prospectos
+        idx_elite = [idx_ordenados[idx] for idx in range(0,n_elite)]
+        # Selecciona los n mejores prospectos
+        elite = [self.poblacion[idx] for idx in idx_elite]
+        return elite        
+    
+    def crossover_uniforme(self,padre1,padre2,prob=0.5):
+        mascara = np.random.rand(len(padre1))<prob
+        hijo1 = np.where(mascara,padre1.genes,padre2.genes)
+        hijo2 = np.where(mascara,padre2.genes,padre1.genes)
+        return [Bird(hijo1),Bird(hijo2)] 
+    
+    def crossover_un_punto(self,padre1,padre2):
+        punto = np.random.randint(1,len(padre1.genes)-1) #aseguro no cortar en extremos 
+        hijo1 = np.concatenate([padre1.genes[:punto],padre2.genes[punto:]])
+        hijo2 = np.concatenate([padre2.genes[:punto],padre1.genes[punto:]])
+        return [Bird(hijo1),Bird(hijo2)] 
 
 
 class Tuberia(pygame.sprite.Sprite):
