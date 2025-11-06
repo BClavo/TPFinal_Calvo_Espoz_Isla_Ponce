@@ -78,8 +78,11 @@ birds = [Bird() for _ in range(10)]
 class Poblacion: 
     def __init__(self,poblacion):
         self.poblacion = poblacion 
-    fitnesses = np.array([b.fitness for b in birds])
-    fit_normalizado = fitnesses / np.sum(fitnesses)
+        self.fitnesses = np.array([b.fitness for b in self.poblacion])
+    def seleccion_por_torneo(self,k=3):
+        participantes_idx = np.random.choice(len(self.poblacion),k,replace=False)
+        mejor_idx = participantes_idx[np.argmax(self.fitnesses[participantes_idx])]
+        return self.poblacion[mejor_idx]
 
 
 class Tuberia:
