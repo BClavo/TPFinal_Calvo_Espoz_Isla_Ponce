@@ -1,7 +1,8 @@
 # Example file showing a basic pygame "game loop"
 import pygame
-import classes
+from classes import Bird, Tuberia
 import json
+import random
 
 with open("config.json") as f:
     config = json.load(f)
@@ -19,16 +20,17 @@ with open("config.json") as f:
     PIPE_SPEED = config["PIPE_SPEED"]
     BIRD_SIZE = config["BIRD_SIZE"]
 
-pipe = classes.Tuberia(650,500,False)
-pipe2 = classes.Tuberia(650,-500+PIPE_GAP,True)
+# pipe = classes.Tuberia(650,500,False)
+# pipe2 = classes.Tuberia(650,-500+PIPE_GAP,True)
 grupo_pipes = pygame.sprite.Group()
-grupo_pipes.add(pipe,pipe2)
+# grupo_pipes.add(pipe,pipe2)
 
-
+top_pipe_image = pygame.image.load('sprites/toppipe.png')
+top_pipe_image = pygame.transform.scale(top_pipe_image, (PIPE_WIDTH, HEIGHT))  # corregido: altura coherente
 
 # pygame setup
 pygame.init() # Inicia todo los modulos de pygame
-screen_ancho, screen_alto = GAME_WIDTH,600
+screen_ancho, screen_alto = GAME_WIDTH,HEIGHT
 screen=pygame.display.set_mode((screen_ancho,screen_alto)) # Crea la ventana ancho/alto
 
 bg_image = pygame.image.load('sprites/bg_dia.png')
@@ -44,9 +46,13 @@ pygame.display.set_caption("Testeo") # Le pone nombre a la ventana
 clock = pygame.time.Clock()
 player = pygame.Rect((300,250,50,50))
 
+NUEVA_TUBERIA = pygame.USEREVENT + 1
+pygame.time.set_timer(NUEVA_TUBERIA, 950)  # cada 1.5 segundos
 
 run = True
 while run:
+
+   
     
     screen.fill("purple") # Llena la pantalla de un color
     screen.blit(bg_image, (0, 0)) # Dibuja una superficie arriba de otra
@@ -62,15 +68,26 @@ while run:
     screen.blit(bg_image, (bg_x, 0))
     screen.blit(bg_image, (bg_x + GAME_WIDTH, 0))
 
-    
-    
-    grupo_pipes.draw(screen)
-    grupo_pipes.update()
-
 
     for event in pygame.event.get(): # Event, las distintas cosas que pueden pasar
         if event.type == pygame.QUIT:
             run = False
+        elif event.type == NUEVA_TUBERIA:
+                        # Centro vertical del hueco (entre tuberías)
+            centro_gap = random.randint(150, HEIGHT - 150)
+
+            # Posición de cada tubería
+            y_top = centro_gap - PIPE_GAP // 2 - 500
+            y_bottom = centro_gap + PIPE_GAP // 2
+
+            tuberia_top = Tuberia(GAME_WIDTH, y_top, True)
+            tuberia_bottom = Tuberia(GAME_WIDTH, y_bottom, False)
+            grupo_pipes.add(tuberia_top, tuberia_bottom)
+
+
+        
+    grupo_pipes.draw(screen)
+    grupo_pipes.update()
     
 
       # flip() the display pone a ver las cosas
