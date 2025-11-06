@@ -19,6 +19,11 @@ with open("config.json") as f:
     PIPE_SPEED = config["PIPE_SPEED"]
     BIRD_SIZE = config["BIRD_SIZE"]
 
+pipe = classes.Tuberia(650,500,False)
+pipe2 = classes.Tuberia(650,-500+PIPE_GAP,True)
+grupo_pipes = pygame.sprite.Group()
+grupo_pipes.add(pipe,pipe2)
+
 
 
 # pygame setup
@@ -57,16 +62,10 @@ while run:
     screen.blit(bg_image, (bg_x, 0))
     screen.blit(bg_image, (bg_x + GAME_WIDTH, 0))
 
-
-    # keys = pygame.key.get_pressed()
-    # if keys[pygame.K_w]==True:
-    #     player.move_ip(0,-1)
-    # elif keys[pygame.K_s]==True:
-    #     player.move_ip(0,1)
-    # elif keys[pygame.K_a]==True:
-    #     player.move_ip(-1,0)
-    # elif keys[pygame.K_d]==True:
-    #     player.move_ip(1,0)
+    
+    
+    grupo_pipes.draw(screen)
+    grupo_pipes.update()
 
 
     for event in pygame.event.get(): # Event, las distintas cosas que pueden pasar
@@ -76,7 +75,7 @@ while run:
 
       # flip() the display pone a ver las cosas
     pygame.display.flip() # Toda la pantalla
-    clock.tick(120)  # Controla los FPS del juego
+    clock.tick(FPS)  # Controla los FPS del juego
     pygame.display.update() # Una parte especifica 
         
 

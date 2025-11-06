@@ -85,19 +85,31 @@ class Poblacion:
         return self.poblacion[mejor_idx]
 
 
-class Tuberia:
-    def __init__(self, x_inicial):
+class Tuberia(pygame.sprite.Sprite):
+    def __init__(self, x_inicial, y_inicial, top):
+        super().__init__()
+        self.top=top
+        self.y = y_inicial
         self.x = x_inicial
         self.width = PIPE_WIDTH
         self.speed = PIPE_SPEED
         self.gap = PIPE_GAP
         self.y_gap = random.randint(self.gap, HEIGHT - self.gap)
+        self.image = top_pipe_image if self.top else bottom_pipe_image
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
 
     def advance(self):
-        self.x -= self.speed
+        self.rect.x -= self.speed
 
     def fuera_de_pantalla(self):
-        return self.x + self.width < 0
+        return self.rect.x + self.width < 0
+    
+    def update(self):
+        self.advance()
+        self.fuera_de_pantalla()
 
 
 class Juego:
