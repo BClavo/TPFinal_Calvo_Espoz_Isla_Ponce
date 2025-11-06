@@ -36,7 +36,7 @@ class Bird:
     def __init__(self, genes=None):
         if genes is None:
             # Genera los genes de forma aleatoria (6 pesos)
-            self.genes = np.array([random.uniform(-1, 1) for _ in range(6)])
+            self.genes = np.random.uniform(-1, 1, 6)
         else:
             self.genes = genes
 
