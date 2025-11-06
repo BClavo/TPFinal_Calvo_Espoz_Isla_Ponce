@@ -77,7 +77,8 @@ while run:
             centro_gap = random.randint(150, HEIGHT - 150)
 
             # Posición de cada tubería
-            y_top = centro_gap - PIPE_GAP // 2 - 500
+            PIPE_HEIGHT=500
+            y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT
             y_bottom = centro_gap + PIPE_GAP // 2
 
             tuberia_top = Tuberia(GAME_WIDTH, y_top, True)

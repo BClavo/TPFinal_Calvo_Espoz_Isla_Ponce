@@ -134,12 +134,8 @@ class Tuberia(pygame.sprite.Sprite):
     
     def update(self):
         self.advance()
-        self.fuera_de_pantalla()
+        if self.fuera_de_pantalla():
+            self.kill()
 
 
-class Juego:
-    def __init__(self):
-        self.ancho = GAME_WIDTH
-        self.fps = FPS
-        self.tiempo_max = MAX_TIME
-        self.gravedad = GRAVITY
+
