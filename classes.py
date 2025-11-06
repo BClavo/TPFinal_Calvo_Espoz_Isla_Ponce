@@ -1,5 +1,6 @@
 import random
 import pygame
+import numpy as np 
 import json
 
 # --- CARGA DE CONFIGURACIÓN ---
@@ -43,6 +44,8 @@ class Bird:
         self.x = WIDTH // 4   # Posición inicial horizontal
         self.vy = 0
         self.alive = True
+        self.distance = 0
+        self.fitness = 0
 
     def decision_aleteo(self, delta_y, delta_x):
         w0, w1, w2, w3, w4, w5 = self.genes
@@ -56,6 +59,10 @@ class Bird:
         # Actualiza la velocidad y la posición del pájaro
         self.vy += GRAVITY
         self.y += self.vy
+        self.distance += 1
+    
+    def calcular_fitness(self):
+        self.fitness = (self.distance/FPS) * PIPE_SPEED
 
     def verify_collision(self, pipe):
         # Verifica superposición en eje X
@@ -63,6 +70,16 @@ class Bird:
             # Verifica choque con tuberías superior o inferior
             if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2:
                 self.alive = False
+        # Verifica 
+        elif self.y < 0 or self.y > HEIGHT:
+            self.alive = False
+
+birds = [Bird() for _ in range(10)]  
+class Poblacion: 
+    def __init__(self,poblacion):
+        self.poblacion = poblacion 
+    fitnesses = np.array([b.fitness for b in birds])
+    fit_normalizado = fitnesses / np.sum(fitnesses)
 
 
 class Tuberia:
@@ -86,5 +103,3 @@ class Juego:
         self.fps = FPS
         self.tiempo_max = MAX_TIME
         self.gravedad = GRAVITY
-
-
