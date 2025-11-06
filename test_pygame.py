@@ -1,14 +1,32 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 import classes
+import json
+
+with open("config.json") as f:
+    config = json.load(f)
+    HEIGHT = config["HEIGHT"]
+    WIDTH = config["WIDTH"]
+    PANEL_WIDTH = config["PANEL_WIDTH"]
+    GAME_WIDTH = config["GAME_WIDTH"]
+    FPS = config["FPS"]
+    MAX_TIME = config["MAX_TIME"]
+    GRAVITY = config["GRAVITY"]
+    FLAP_STRENGTH = config["FLAP_STRENGTH"]
+    PIPE_WIDTH = config["PIPE_WIDTH"]
+    PIPE_GAP = config["PIPE_GAP"]
+    MIN_PIPE_GAP = config["MIN_PIPE_GAP"]
+    PIPE_SPEED = config["PIPE_SPEED"]
+    BIRD_SIZE = config["BIRD_SIZE"]
+
 
 
 # pygame setup
 pygame.init() # Inicia todo los modulos de pygame
-screen_ancho, screen_alto = 1000,600 
+screen_ancho, screen_alto = GAME_WIDTH,600
 screen=pygame.display.set_mode((screen_ancho,screen_alto)) # Crea la ventana ancho/alto
 
-bg_image = pygame.image.load('sprites/bg_night.png')
+bg_image = pygame.image.load('sprites/bg.png')
 bg_x = 0
 bg_speed = 2  # velocidad del fondo
 
@@ -32,12 +50,12 @@ while run:
     
     # Mover fondo
     bg_x -= bg_speed
-    if bg_x <= -WIDTH:
+    if bg_x <= -GAME_WIDTH:
         bg_x = 0
 
     # Dibujar fondo dos veces para scroll infinito
     screen.blit(bg_image, (bg_x, 0))
-    screen.blit(bg_image, (bg_x + WIDTH, 0))
+    screen.blit(bg_image, (bg_x + GAME_WIDTH, 0))
 
 
     # keys = pygame.key.get_pressed()
