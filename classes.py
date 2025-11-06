@@ -1,9 +1,8 @@
 import random
-# import os
 import pygame
-# import time
 import json
 
+# --- CARGA DE CONFIGURACIÓN ---
 with open("config.json") as f:
     config = json.load(f)
     HEIGHT = config["HEIGHT"]
@@ -20,66 +19,72 @@ with open("config.json") as f:
     PIPE_SPEED = config["PIPE_SPEED"]
     BIRD_SIZE = config["BIRD_SIZE"]
 
-
+# --- CARGA DE IMÁGENES ---
 fondo = pygame.image.load('sprites/bg.png')
-base = pygame.image.load('sprites/base')
+base = pygame.image.load('sprites/base.png')  # corregido: faltaba ".png"
 imagen_pajarito = pygame.image.load('sprites/bird1.png')
-imagen_pajarito = pygame.transform.scale(imagen_pajarito, (30))
+imagen_pajarito = pygame.transform.scale(imagen_pajarito, (BIRD_SIZE, BIRD_SIZE))  # corregido: debía ser tupla
 top_pipe_image = pygame.image.load('sprites/toppipe.png')
-top_pipe_image = pygame.transform.scale(top_pipe_image, (PIPE_WIDTH, 20))
-bottom_pipe_image = pygame.image.load('sprite/bottompipe.png')
-bottom_pipe_image = pygame.transform.scale(bottom_pipe_image, (PIPE_WIDTH, 20))
+top_pipe_image = pygame.transform.scale(top_pipe_image, (PIPE_WIDTH, HEIGHT))  # corregido: altura coherente
+bottom_pipe_image = pygame.image.load('sprites/bottompipe.png')  # corregido: "sprites" en plural
+bottom_pipe_image = pygame.transform.scale(bottom_pipe_image, (PIPE_WIDTH, HEIGHT))
 
+# --- CLASES ---
 
 class Bird:
     def __init__(self, genes=None):
-        if genes == None:
-            self.genes = [random.uniform(-1, 1) for _ in range(0,
-                                                               6)]  # Genera los genes de forma aleatoria, representados como vectores de 6 elementos.
+        if genes is None:
+            # Genera los genes de forma aleatoria (6 pesos)
+            self.genes = [random.uniform(-1, 1) for _ in range(6)]
         else:
             self.genes = genes
 
-        # self.y = altura_de_la pantalla // 2 #El pajaro se inicia en la mitad de la pantalla.
-        self.vy = 0  # Velocidad para subir y bajar
-        self.x = 0
+        self.y = HEIGHT // 2  # Inicia en el medio de la pantalla
+        self.x = WIDTH // 4   # Posición inicial horizontal
+        self.vy = 0
         self.alive = True
 
     def decision_aleteo(self, delta_y, delta_x):
         w0, w1, w2, w3, w4, w5 = self.genes
         value = w0 + w1 * delta_y + w2 * (delta_y ** 2) + w3 * delta_x + w4 * (delta_x ** 2) + w5 * self.vy
-        return value > 0  # Si es menor a cero no aletea, si es mayor a 0 aletea.
+        return value > 0  # Si es positivo, aletea
 
-    def fly(self, fuerza_de_aleteo=-10):
+    def fly(self, fuerza_de_aleteo=FLAP_STRENGTH):
         self.vy = fuerza_de_aleteo
 
-    def actualizar_posicion(self, delta_y, delta_x, aleteo):
+    def actualizar_posicion(self):
+        # Actualiza la velocidad y la posición del pájaro
         self.vy += GRAVITY
-        self.y = self.vy
+        self.y += self.vy
 
     def verify_collision(self, pipe):
-        if pipe.x < self.x + BIRD_SIZE and pipe.x + PIPE_WIDTH > self.x: # Verifica si hay superposicion en X, lo que permite una salida rapida si el pajaro no esta cerca d ela tuberia.
-            if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2: #Verifica si hay un choque con la tuberia superior o inferior.
+        # Verifica superposición en eje X
+        if pipe.x < self.x + BIRD_SIZE and pipe.x + PIPE_WIDTH > self.x:
+            # Verifica choque con tuberías superior o inferior
+            if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2:
                 self.alive = False
 
-class Tuberia:
-    def __init__(self, x_incial):  # }
-        self.x = x_incial  # } HAy que sacar al x inicial como argumento, y ponerlo como algo fijo
-        self.width = WIDTH
-        self.speed = PIPE_SPEED
 
+class Tuberia:
+    def __init__(self, x_inicial):
+        self.x = x_inicial
+        self.width = PIPE_WIDTH
+        self.speed = PIPE_SPEED
         self.gap = PIPE_GAP
-        self.y_gap = random.randint(self.gap, HEIGHT - self.gap)  # El hueco de la tubería se forma dentro de este rango, para respetar siempre el mismo tamaño
+        self.y_gap = random.randint(self.gap, HEIGHT - self.gap)
 
     def advance(self):
-        self.x -= PIPE_SPEED
+        self.x -= self.speed
+
     def fuera_de_pantalla(self):
-        return self.x + self.ancho < 0
+        return self.x + self.width < 0
 
 
 class Juego:
-    def __init__(self,ancho,fps,tiempo_max,gravedad):
-        self.ancho=ancho
-        self.fps=fps
-        self.tiempo_max=tiempo_max
-        self.gravedad=gravedad
+    def __init__(self, ancho, fps, tiempo_max, gravedad):
+        self.ancho = ancho
+        self.fps = fps
+        self.tiempo_max = tiempo_max
+        self.gravedad = gravedad
+
 
