@@ -72,10 +72,19 @@ class Bird(pygame.sprite.Sprite):
     def fly(self, fuerza_de_aleteo=FLAP_STRENGTH):
         self.vy = fuerza_de_aleteo
 
+
     def actualizar_posicion(self):
         self.vy += GRAVITY
         self.rect.y += self.vy
-        self.distance += 1
+
+        # Limitar que no suba más arriba del cielo
+        if self.rect.top <= 0:
+            self.rect.top = 0
+            self.vy = 0  # evita que siga "rebotando"
+
+        # Si cae debajo del suelo, muere
+        if self.rect.bottom >= HEIGHT:
+            self.alive = False
 
 
     def calcular_fitness(self):

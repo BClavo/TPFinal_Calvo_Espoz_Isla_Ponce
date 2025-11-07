@@ -42,9 +42,17 @@ fondo_velocidad = 2
 grupo_pipes = pygame.sprite.Group()
 grupo_pajaros = pygame.sprite.Group()
 
-# Crear pájaro
-pajaro = Bird()
-grupo_pajaros.add(pajaro)
+# Crear pájaros
+
+NUM_PAJAROS = 20  # Número total de pájaros que se van a crear
+pajaros = []  # Lista para guardar referencias individuales a cada pájaro
+
+for pajaro in range(NUM_PAJAROS):  # Bucle para crear múltiples pájaros
+    b = Bird()  # Instancia de un nuevo pájaro 
+    # b.rect.y = random.randint(HEIGHT // 3, HEIGHT - 100)  # Posición vertical aleatoria dentro de un rango jugable (para verlos)
+    grupo_pajaros.add(b)  # Se agrega el pájaro al grupo de sprites
+    pajaros.append(b)  # Se guarda el pájaro en la lista para acceso individual (por ejemplo, en simulaciones genéticas)
+
 
 # Evento para tuberías
 NUEVA_TUBERIA = pygame.USEREVENT + 1
@@ -90,14 +98,15 @@ while run:
     pipes_front.sort(key=clave_distancia)
     next_pipe = pipes_front[0] if pipes_front else None
 
-    if pajaro.alive:
-        if next_pipe and pajaro.decision_aleteo(next_pipe):
-            pajaro.fly()
-        pajaro.actualizar_posicion()
+    for pajaro in pajaros:
+        if pajaro.alive:
+            if next_pipe and pajaro.decision_aleteo(next_pipe):
+                pajaro.fly()
+            pajaro.actualizar_posicion()
 
-    # Colisión con tuberías
-    if pygame.sprite.spritecollideany(pajaro, grupo_pipes):
-        pajaro.alive = False
+            # Colisión con tuberías
+            if pygame.sprite.spritecollideany(pajaro, grupo_pipes):
+                pajaro.alive = False
 
 
     # --- DIBUJO ---
