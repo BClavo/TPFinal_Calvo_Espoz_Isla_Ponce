@@ -20,84 +20,91 @@ with open("config.json") as f:
     PIPE_SPEED = config["PIPE_SPEED"]
     BIRD_SIZE = config["BIRD_SIZE"]
 
-# pipe = classes.Tuberia(650,500,False)
-# pipe2 = classes.Tuberia(650,-500+PIPE_GAP,True)
-grupo_pipes = pygame.sprite.Group()
-# grupo_pipes.add(pipe,pipe2)
-
-top_pipe_image = pygame.image.load('sprites/toppipe.png')
-top_pipe_image = pygame.transform.scale(top_pipe_image, (PIPE_WIDTH, HEIGHT))  # corregido: altura coherente
-
-# pygame setup
-pygame.init() # Inicia todo los modulos de pygame
-screen_ancho, screen_alto = GAME_WIDTH,HEIGHT
-screen=pygame.display.set_mode((screen_ancho,screen_alto)) # Crea la ventana ancho/alto
-
-bg_image = pygame.image.load('sprites/bg_dia.png')
-bg_x = 0
-bg_speed = 2  # velocidad del fondo
-
-
-# Scale the image to fit the screen (if necessary)
-bg_image = pygame.transform.scale(bg_image, (screen_ancho, screen_alto))
-
-
-pygame.display.set_caption("Testeo") # Le pone nombre a la ventana
+tiempo = pygame.time.get_ticks()
+# Inicializar pygame
+pygame.init()
+screen = pygame.display.set_mode((GAME_WIDTH, HEIGHT))
+pygame.display.set_caption("Flappy Bird Genético")
 clock = pygame.time.Clock()
-player = pygame.Rect((300,250,50,50))
 
+# Fondo
+fondo_image = pygame.image.load('sprites/bg_dia.png')
+fondo_image = pygame.transform.scale(fondo_image, (GAME_WIDTH, HEIGHT))
+fondo_x = 0
+fondo_velocidad = 2
+
+# Grupos
+grupo_pipes = pygame.sprite.Group()
+grupo_pajaros = pygame.sprite.Group()
+
+# Crear pájaro
+pajaro = Bird()
+grupo_pajaros.add(pajaro)
+
+# Evento para tuberías
 NUEVA_TUBERIA = pygame.USEREVENT + 1
-pygame.time.set_timer(NUEVA_TUBERIA, 950)  # cada 1.5 segundos
+pygame.time.set_timer(NUEVA_TUBERIA, 950) # 0,95 seg
 
+# Inicializar frame contador
+frame = 0
+
+# Loop principal
+run = True
+# Loop principal
 run = True
 while run:
+    screen.blit(fondo_image, (fondo_x, 0))
+    screen.blit(fondo_image, (fondo_x + GAME_WIDTH, 0))
+    fondo_x -= fondo_velocidad
+    if fondo_x <= -GAME_WIDTH:
+        fondo_x = 0
 
-   
-    
-    screen.fill("purple") # Llena la pantalla de un color
-    screen.blit(bg_image, (0, 0)) # Dibuja una superficie arriba de otra
-    pygame.draw.rect(screen,(255,0,0),player) 
-
-    
-    # Mover fondo
-    bg_x -= bg_speed
-    if bg_x <= -GAME_WIDTH:
-        bg_x = 0
-
-    # Dibujar fondo dos veces para scroll infinito
-    screen.blit(bg_image, (bg_x, 0))
-    screen.blit(bg_image, (bg_x + GAME_WIDTH, 0))
-
-
-    for event in pygame.event.get(): # Event, las distintas cosas que pueden pasar
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         elif event.type == NUEVA_TUBERIA:
-                        # Centro vertical del hueco (entre tuberías)
             MARGEN_VERTICAL = 150
             centro_gap = random.randint(MARGEN_VERTICAL, HEIGHT - MARGEN_VERTICAL)
-
-            # Posición de cada tubería
-    
-            PIPE_HEIGHT=500
+            PIPE_HEIGHT = 500
             y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT
             y_bottom = centro_gap + PIPE_GAP // 2
-
             tuberia_top = Tuberia(GAME_WIDTH, y_top, True)
             tuberia_bottom = Tuberia(GAME_WIDTH, y_bottom, False)
             grupo_pipes.add(tuberia_top, tuberia_bottom)
 
+    # --- LÓGICA DEL PÁJARO GENÉTICO ---
+    def clave_distancia(pipe):
+        return pajaro.distancia_a(pipe)
 
-        
-    grupo_pipes.draw(screen)
+    pipes_front = [p for p in grupo_pipes if p.rect.x + p.width > pajaro.rect.x]
+    pipes_front.sort(key=clave_distancia)
+    next_pipe = pipes_front[0] if pipes_front else None
+
+    if pajaro.alive:
+        if next_pipe and pajaro.decision_aleteo(next_pipe):
+            pajaro.fly()
+        pajaro.actualizar_posicion()
+
+    # Colisión con tuberías
+    if pygame.sprite.spritecollideany(pajaro, grupo_pipes):
+        pajaro.alive = False
+
+
+    # --- DIBUJO ---
     grupo_pipes.update()
-    
+    grupo_pipes.draw(screen)
+    if pajaro.alive:
+        grupo_pajaros.draw(screen)
+    else:
+        None
 
-      # flip() the display pone a ver las cosas
-    pygame.display.flip() # Toda la pantalla
-    clock.tick(FPS)  # Controla los FPS del juego
-    pygame.display.update() # Una parte especifica 
-        
+    pygame.display.flip()
+    clock.tick(FPS)  
 
 
-pygame.quit() # Finaliza los modulos
+    pygame.display.flip()
+    # pygame.display.update()
+    clock.tick(FPS)
+   
+
+pygame.quit()
