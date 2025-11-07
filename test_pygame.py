@@ -23,13 +23,18 @@ with open("config.json") as f:
 tiempo = pygame.time.get_ticks()
 # Inicializar pygame
 pygame.init()
-screen = pygame.display.set_mode((GAME_WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird Genético")
 clock = pygame.time.Clock()
 
+panel_juego = pygame.Surface((GAME_WIDTH, HEIGHT))
+panel = pygame.Surface((PANEL_WIDTH, HEIGHT))
+
+
 # Fondo
-fondo_image = pygame.image.load('sprites/bg_dia.png')
-fondo_image = pygame.transform.scale(fondo_image, (GAME_WIDTH, HEIGHT))
+fondo_juego = pygame.image.load('sprites/bg_dia.png')
+fondo_juego= pygame.transform.scale(fondo_juego, (GAME_WIDTH, HEIGHT))
+NEGRO = (0, 0, 0)
 fondo_x = 0
 fondo_velocidad = 2
 
@@ -51,11 +56,14 @@ frame = 0
 # Loop principal
 run = True
 while run:
-    screen.blit(fondo_image, (fondo_x, 0))
-    screen.blit(fondo_image, (fondo_x + GAME_WIDTH, 0))
+
+    # Dibujar panel izquierdo con la imagen del juego moviendose
+    screen.blit(fondo_juego, (fondo_x, 0))
+    screen.blit(fondo_juego, (fondo_x + GAME_WIDTH, 0))
     fondo_x -= fondo_velocidad
     if fondo_x <= -GAME_WIDTH:
         fondo_x = 0
+     
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -96,9 +104,14 @@ while run:
     else:
         None
 
+    
+    # Dibujar panel derecho en negro
+    pygame.draw.rect(screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
+
+
     pygame.display.flip()
     # pygame.display.update()
-    clock.tick(FPS - 30)
+    clock.tick(FPS)
    
 
 pygame.quit()
