@@ -48,7 +48,7 @@ grupo_pajaros.add(pajaro)
 
 # Evento para tuberías
 NUEVA_TUBERIA = pygame.USEREVENT + 1
-pygame.time.set_timer(NUEVA_TUBERIA, 950) # 0,95 seg
+pygame.time.set_timer(NUEVA_TUBERIA, 1000) # 0,95 seg
 
 # Inicializar frame contador
 frame = 0
@@ -68,15 +68,19 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        elif event.type == NUEVA_TUBERIA:
-            MARGEN_VERTICAL = 150
-            centro_gap = random.randint(MARGEN_VERTICAL, HEIGHT - MARGEN_VERTICAL)
-            PIPE_HEIGHT = 500
-            y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT
-            y_bottom = centro_gap + PIPE_GAP // 2
-            tuberia_top = Tuberia(GAME_WIDTH, y_top, True)
-            tuberia_bottom = Tuberia(GAME_WIDTH, y_bottom, False)
-            grupo_pipes.add(tuberia_top, tuberia_bottom)
+        elif event.type == NUEVA_TUBERIA:  # Evento personalizado para generar nuevas tuberías
+            MARGEN_VERTICAL = 150  # Margen para evitar que el hueco esté demasiado cerca de los bordes
+            centro_gap = random.randint(MARGEN_VERTICAL, HEIGHT - MARGEN_VERTICAL)  # Posición vertical aleatoria del centro del hueco
+
+            PIPE_HEIGHT = 500  # Altura fija de cada tubería
+
+            y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT  # Posición Y de la tubería superior (invertida)
+            y_bottom = centro_gap + PIPE_GAP // 2  # Posición Y de la tubería inferior (normal)
+
+            tuberia_top = Tuberia(GAME_WIDTH, y_top, True)  # Crea la tubería superior en el borde derecho
+            tuberia_bottom = Tuberia(GAME_WIDTH, y_bottom, False)  # Crea la tubería inferior en el borde derecho
+
+            grupo_pipes.add(tuberia_top, tuberia_bottom)  # Agrega ambas tuberías al grupo de sprites
 
     # --- LÓGICA DEL PÁJARO GENÉTICO ---
     def clave_distancia(pipe):
