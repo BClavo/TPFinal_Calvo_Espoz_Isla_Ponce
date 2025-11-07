@@ -35,50 +35,69 @@ bottom_pipe_image = pygame.transform.scale(bottom_pipe_image, (PIPE_WIDTH, HEIGH
 class Bird(pygame.sprite.Sprite):
     def __init__(self, genes=None):
         super().__init__()
-        if genes is None:
-            # Genera los genes de forma aleatoria (6 pesos)
-            self.genes = np.random.uniform(-1, 1, 6)
-        else:
-            self.genes = genes
+        self.genes = genes if genes is not None else np.random.uniform(-1, 1, 6)
 
-        self.y = HEIGHT // 2  # Inicia en el medio de la pantalla
-        self.x = WIDTH // 4   # Posición inicial horizontal
+        self.image = imagen_pajarito
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH // 4
+        self.rect.y = HEIGHT // 2
+
         self.vy = 0
         self.alive = True
         self.distance = 0
         self.fitness = 0
 
-    def decision_aleteo(self, delta_y, delta_x):
+    def decision_aleteo(self, pipe):
+        # Calcula diferencias con la tubería actual
+        delta_x = pipe.rect.x - self.rect.x
+        delta_y = pipe.y_gap - self.rect.y  # diferencia vertical al centro del hueco
+
+        # Desempaqueta los genes
         w0, w1, w2, w3, w4, w5 = self.genes
-        value = w0 + w1 * delta_y + w2 * (delta_y ** 2) + w3 * delta_x + w4 * (delta_x ** 2) + w5 * self.vy
-        return value > 0  # Si es positivo, aletea
+        
+        # Calcula la función lineal o polinómica de decisión
+        value = (
+            w0
+            + w1 * delta_y
+            + w2 * (delta_y ** 2)
+            + w3 * delta_x
+            + w4 * (delta_x ** 2)
+            + w5 * self.vy
+        )
+
+        # Devuelve True si decide aletear
+        return value > 0
+
 
     def fly(self, fuerza_de_aleteo=FLAP_STRENGTH):
         self.vy = fuerza_de_aleteo
 
     def actualizar_posicion(self):
-        # Actualiza la velocidad y la posición del pájaro
         self.vy += GRAVITY
-        self.y += self.vy
+        self.rect.y += self.vy
         self.distance += 1
-    
+
+
     def calcular_fitness(self):
-        # Calcula la distancia neta recorrida por el pajaro 
-        self.fitness = (self.distance/FPS) * PIPE_SPEED
+        self.fitness = (self.distance / FPS) * PIPE_SPEED
 
     def verify_collision(self, pipe):
-        # Verifica superposición en eje X
-        if pipe.x < self.x + BIRD_SIZE and pipe.x + PIPE_WIDTH > self.x:
-            # Verifica choque con tuberías superior o inferior
-            if self.y < pipe.y_gap - pipe.gap / 2 or self.y + BIRD_SIZE > pipe.y_gap + pipe.gap / 2:
+        # Verifica superposición horizontal
+        if self.rect.right > pipe.rect.left and self.rect.left < pipe.rect.right:
+            # Verifica si está fuera del hueco vertical
+            if self.rect.top < pipe.y_gap - pipe.gap // 2 or self.rect.bottom > pipe.y_gap + pipe.gap // 2:
                 self.alive = False
-        # Verifica que el pajaro no salga del mapa 
-        elif self.y < 0 or self.y > HEIGHT:
+
+        # Verifica si salió de pantalla
+        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.alive = False
 
-birds = [Bird() for _ in range(10)]  
+    def distancia_a(self, pipe):
+        """Devuelve la distancia horizontal desde el pájaro a la tubería."""
+        return pipe.rect.x - self.rect.x
 
-class Poblacion:
+birds = [Bird() for _ in range(10)]  
+class Poblacion: 
     def __init__(self,poblacion):
         self.poblacion = poblacion 
         self.fitnesses = np.array([b.fitness for b in self.poblacion])
@@ -99,7 +118,7 @@ class Poblacion:
         return elite        
     
     def crossover_uniforme(self,padre1,padre2,prob=0.5):
-        mascara = np.random.rand(len(padre1.genes))<prob
+        mascara = np.random.rand(len(padre1))<prob
         hijo1 = np.where(mascara,padre1.genes,padre2.genes)
         hijo2 = np.where(mascara,padre2.genes,padre1.genes)
         return [Bird(hijo1),Bird(hijo2)] 
@@ -108,17 +127,8 @@ class Poblacion:
         punto = np.random.randint(1,len(padre1.genes)-1) #aseguro no cortar en extremos 
         hijo1 = np.concatenate([padre1.genes[:punto],padre2.genes[punto:]])
         hijo2 = np.concatenate([padre2.genes[:punto],padre1.genes[punto:]])
-        return [Bird(hijo1),Bird(hijo2)]
+        return [Bird(hijo1),Bird(hijo2)] 
 
-    def mutacion(self, arreglo_de_genes, intensificacion = 0.1, probabilidad_de_mutacion = 0.075):
-        ###
-        mascara = np.random.rand(*arreglo_de_genes.shape) < probabilidad_de_mutacion
-        ruido = np.random.rand(*arreglo_de_genes.shape) * intensificacion
-        nueva_poblacion = np.where(mascara, arreglo_de_genes + ruido, arreglo_de_genes)
-
-        #Centinela: revisa que los valores de las mutaciones no excedan el rango.
-        np.clip(nueva_poblacion,-1,1,out=nueva_poblacion)
-        return nueva_poblacion
 
 class Tuberia(pygame.sprite.Sprite):
     def __init__(self, x_inicial, y_inicial, top):
@@ -134,6 +144,7 @@ class Tuberia(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
 
     def advance(self):
         self.rect.x -= self.speed
