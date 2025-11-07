@@ -97,6 +97,7 @@ class Bird(pygame.sprite.Sprite):
         return pipe.rect.x - self.rect.x
 
 birds = [Bird() for _ in range(10)]  
+
 class Poblacion: 
     def __init__(self,poblacion):
         self.poblacion = poblacion 
@@ -118,7 +119,7 @@ class Poblacion:
         return elite        
     
     def crossover_uniforme(self,padre1,padre2,prob=0.5):
-        mascara = np.random.rand(len(padre1))<prob
+        mascara = np.random.rand(len(padre1.genes))<prob
         hijo1 = np.where(mascara,padre1.genes,padre2.genes)
         hijo2 = np.where(mascara,padre2.genes,padre1.genes)
         return [Bird(hijo1),Bird(hijo2)] 
@@ -127,7 +128,19 @@ class Poblacion:
         punto = np.random.randint(1,len(padre1.genes)-1) #aseguro no cortar en extremos 
         hijo1 = np.concatenate([padre1.genes[:punto],padre2.genes[punto:]])
         hijo2 = np.concatenate([padre2.genes[:punto],padre1.genes[punto:]])
-        return [Bird(hijo1),Bird(hijo2)] 
+        return [Bird(hijo1),Bird(hijo2)]
+
+    def mutacion(self, arreglo_de_genes, intensificacion = 0.1, probabilidad_de_mutacion = 0.075):
+        ###
+        mascara = np.random.rand(*arreglo_de_genes.shape) < probabilidad_de_mutacion
+        ruido = np.random.rand(*arreglo_de_genes.shape) * intensificacion
+        nueva_poblacion = np.where(mascara, arreglo_de_genes + ruido, arreglo_de_genes)
+
+        #Centinela: revisa que los valores de las mutaciones no excedan el rango.
+        np.clip(nueva_poblacion,-1,1,out=nueva_poblacion)
+        return nueva_poblacion
+
+    
 
 
 class Tuberia(pygame.sprite.Sprite):
