@@ -50,8 +50,6 @@ frame = 0
 
 # Loop principal
 run = True
-# Loop principal
-run = True
 while run:
     screen.blit(fondo_image, (fondo_x, 0))
     screen.blit(fondo_image, (fondo_x + GAME_WIDTH, 0))
@@ -99,12 +97,8 @@ while run:
         None
 
     pygame.display.flip()
-    clock.tick(FPS)  
-
-
-    pygame.display.flip()
     # pygame.display.update()
-    clock.tick(FPS)
+    clock.tick(FPS - 30)
    
 
 pygame.quit()
