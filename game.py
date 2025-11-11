@@ -36,6 +36,11 @@ class Juego:
         # Inicializar tuberías
         self.generar_tuberias_iniciales()
 
+        # Fuentes 
+        self.font_title = pygame.font.Font(None, 36)
+        self.font_text = pygame.font.Font(None, 28)
+        self.font_small = pygame.font.Font(None, 22)
+
 
     def cargar_imagenes(self):
         """Carga y escala todas las imágenes del juego"""
@@ -139,6 +144,21 @@ class Juego:
 
         self.generation += 1
         self.generar_tuberias_iniciales()
+
+    def dibujar_estadisticas(self):
+        """Dibuja el panel lateral de estadísticas"""
+        pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
+        y = 20
+        self.screen.blit(self.font_title.render("ESTADÍSTICAS", True, BLANCO), (GAME_WIDTH + 40, y))
+        y += 60
+        vivos = sum(1 for b in self.pajaros if b.vivo)
+        stats = [
+            (f"Generación: {self.generation}", VERDE),
+            (f"Vivos: {vivos}/{NUM_PAJAROS}", BLANCO),
+        ]
+        for text, color in stats:
+            self.screen.blit(self.font_text.render(text, True, color), (GAME_WIDTH + 20, y))
+            y += 40
 
     def reiniciar(self):
         self.generation = 1
