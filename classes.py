@@ -120,15 +120,14 @@ class Pajaro(pygame.sprite.Sprite):
     def verificar_colision_tuberia(self, grupo_tuberias):
         """Detecta colisión con alguna tubería."""
         if pygame.sprite.spritecollideany(self, grupo_tuberias):
-            self.alive = False
             self.muerte()
 
     def verificar_tuberia_pasada(self, tuberia):
         """Detecta si el pájaro ya pasó la tubería."""
         if self.rect.left > tuberia.rect.right:
-            if self.last_pipe_passed != id(tuberia):
-                self.pipes_passed += 1
-                self.last_pipe_passed = id(tuberia)
+            if self.ultima_tuberia_pasada != id(tuberia):
+                self.tuberias_pasadas += 1
+                self.ultima_tuberia_pasada = id(tuberia)
 
 
 
