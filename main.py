@@ -1,5 +1,5 @@
 import pygame
-from config import WIDTH, HEIGHT
+from config import *
 from game import Juego
 
 
