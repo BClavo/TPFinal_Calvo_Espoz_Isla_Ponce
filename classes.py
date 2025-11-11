@@ -132,3 +132,119 @@ class Pajaro(pygame.sprite.Sprite):
                 self.ultima_tuberia_pasada = siguiente_tuberia.pipe_id
                 return True
         return False
+
+
+
+class Tuberia(pygame.sprite.Sprite):
+    """
+    Representa una tubería (superior o inferior)
+    """
+    def __init__(self, x_inicial, y_inicial, top, imagen_top=None, imagen_bottom=None):
+        super().__init__()
+        
+        # Configuración básica
+        self.top = top
+        self.y = y_inicial
+        self.x = x_inicial
+        self.width = PIPE_WIDTH
+        self.speed = PIPE_SPEED
+        self.gap = PIPE_GAP
+        
+        # ID único para identificar pares de tuberías
+        self.pipe_id = None
+        
+        # Calcular el centro del hueco
+        if top:
+            # Tubería superior: hueco está DEBAJO
+            self.y_gap = y_inicial + PIPE_HEIGHT + (PIPE_GAP // 2)
+            self.image = imagen_top
+        else:
+            # Tubería inferior: hueco está ARRIBA
+            self.y_gap = y_inicial - (PIPE_GAP // 2)
+            self.image = imagen_bottom   
+        
+        # Rectángulo de colisión
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def advance(self):
+        """Mueve la tubería hacia la izquierda"""
+        self.rect.x -= self.speed
+
+    def fuera_de_pantalla(self):
+        """Verifica si la tubería salió de la pantalla"""
+        return self.rect.x + self.width < 0
+    
+    def update(self):
+        """Actualiza la posición y elimina si está fuera de pantalla"""
+        self.advance()
+        if self.fuera_de_pantalla():
+            self.kill()
+
+
+def crear_par_tuberias(x_inicial, centro_gap, imagen_top=None, imagen_bottom=None):
+    """
+    Crea un par de tuberías (superior e inferior) con el mismo ID
+    
+    Args:
+        x_inicial: Posición X inicial
+        centro_gap: Posición Y del centro del hueco
+        imagen_top: Imagen para tubería superior
+        imagen_bottom: Imagen para tubería inferior
+    
+    Returns:
+        tuple: (tuberia_superior, tuberia_inferior)
+    """
+    y_top = centro_gap - PIPE_GAP // 2 - PIPE_HEIGHT
+    y_bottom = centro_gap + PIPE_GAP // 2
+    
+    tuberia_top = Tuberia(x_inicial, y_top, True, imagen_top, imagen_bottom)
+    tuberia_bottom = Tuberia(x_inicial, y_bottom, False, imagen_top, imagen_bottom)
+    
+    # Asignar el mismo ID a ambas tuberías del par
+    shared_id = id(tuberia_top)
+    tuberia_top.pipe_id = shared_id
+    tuberia_bottom.pipe_id = shared_id
+    
+    return tuberia_top, tuberia_bottom
+
+# background.py
+"""
+Clase Background para manejar el fondo con scroll infinito
+"""
+import pygame
+from config import *
+
+
+class Background:
+    """
+    Maneja el fondo con scroll infinito
+    """
+    def __init__(self, imagen_fondo):
+        self.imagen = imagen_fondo
+        self.x1 = 0
+        self.x2 = GAME_WIDTH
+        self.velocidad = 2
+        self.width = GAME_WIDTH
+
+    def update(self):
+        """Actualiza la posición del fondo para crear efecto de scroll"""
+        self.x1 -= self.velocidad
+        self.x2 -= self.velocidad
+
+        # Resetear posición cuando sale de pantalla
+        if self.x1 <= -self.width:
+            self.x1 = self.x2 + self.width
+        
+        if self.x2 <= -self.width:
+            self.x2 = self.x1 + self.width
+
+    def draw(self, screen):
+        """Dibuja el fondo en la pantalla"""
+        screen.blit(self.imagen, (self.x1, 0))
+        screen.blit(self.imagen, (self.x2, 0))
+
+    def set_velocidad(self, velocidad):
+        """Cambia la velocidad del scroll"""
+        self.velocidad = velocidad
