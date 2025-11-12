@@ -70,6 +70,7 @@ class Juego:
         for b in self.pajaros:
             self.grupo_pajaros.add(b)
         self.poblacion = Poblacion(self.pajaros)
+        self.pajaros_vivos=self.pajaros.copy()
 
     def generar_nueva_tuberia(self):
         """Genera un nuevo par de tuberías"""
@@ -94,11 +95,10 @@ class Juego:
 
     def obtener_tuberia_cercana(self):
         """Obtiene la tubería más cercana adelante de los pájaros vivos"""
-        pajaros_vivos = [b for b in self.pajaros if b.vivo]
-        if not pajaros_vivos:
+        if not self.pajaros_vivos:
             return None
 
-        promedio_x = sum(b.rect.right for b in pajaros_vivos) / len(pajaros_vivos)
+        promedio_x = sum(b.rect.right for b in self.pajaros_vivos) / len(self.pajaros_vivos)
         pipes_front = [p for p in self.grupo_tuberias if p.rect.x + p.ancho > promedio_x]
         pipes_front.sort(key=lambda p: p.rect.x - promedio_x)
 
@@ -106,12 +106,14 @@ class Juego:
 
     def actualizar_pajaros(self):
         """Actualiza la lógica de todos los pájaros vivos"""
-        pajaros_vivos = [b for b in self.pajaros if b.vivo]
-        if not pajaros_vivos:
+        if not self.pajaros_vivos:
             return False
-
+        
         next_pipe = self.obtener_tuberia_cercana()
-        for pajaro in pajaros_vivos:
+        for pajaro in self.pajaros_vivos:
+            if not pajaro.vivo:
+                self.pajaros_vivos.remove(pajaro)
+                continue
             if next_pipe and pajaro.decision_aleteo(next_pipe):
                 pajaro.aletear()
             pajaro.actualizar_posicion()
@@ -137,7 +139,7 @@ class Juego:
         self.pajaros = self.poblacion.crear_nueva_generacion(
             self.imagen_pajarito, self.cadaver
         )
-
+        self.pajaros_vivos=self.pajaros.copy()
         self.grupo_pajaros.empty()
         for b in self.pajaros:
             self.grupo_pajaros.add(b)
@@ -151,10 +153,12 @@ class Juego:
         y = 20
         self.screen.blit(self.font_title.render("ESTADÍSTICAS", True, BLANCO), (GAME_WIDTH + 40, y))
         y += 60
-        vivos = sum(1 for b in self.pajaros if b.vivo)
+        vivos = len(self.pajaros_vivos)
+        tub_pas= max(b.tuberias_pasadas for b in self.pajaros_vivos) if vivos!=0 else 0
         stats = [
             (f"Generación: {self.generation}", VERDE),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", BLANCO),
+            (f"tuberías pasadas: {tub_pas}", BLANCO)
         ]
         for text, color in stats:
             self.screen.blit(self.font_text.render(text, True, color), (GAME_WIDTH + 20, y))

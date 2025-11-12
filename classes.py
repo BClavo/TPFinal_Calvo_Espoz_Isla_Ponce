@@ -27,7 +27,7 @@ class Pajaro(pygame.sprite.Sprite):
         self.distancia = 0
         self.fitness = 0
         self.tiempo_vivo = 0
-        self.tuberias_pasadas = 0
+        self.tuberias_pasadas = -1
         self.ultima_tuberia_pasada = None
 
     def decision_aleteo(self, tuberia):
@@ -124,10 +124,9 @@ class Pajaro(pygame.sprite.Sprite):
 
     def verificar_tuberia_pasada(self, tuberia):
         """Detecta si el pájaro ya pasó la tubería."""
-        if self.rect.left > tuberia.rect.right:
-            if self.ultima_tuberia_pasada != id(tuberia):
-                self.tuberias_pasadas += 1
-                self.ultima_tuberia_pasada = id(tuberia)
+        if self.ultima_tuberia_pasada != tuberia.id_tuberia:
+            self.tuberias_pasadas += 1
+            self.ultima_tuberia_pasada = tuberia.id_tuberia
 
 
 
