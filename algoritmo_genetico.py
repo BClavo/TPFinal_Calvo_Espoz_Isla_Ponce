@@ -9,7 +9,7 @@ class Poblacion:
         self.poblacion = poblacion
         self.fitnesses = np.array([b.fitness for b in self.poblacion])
 
-    def seleccion_por_torneo(self, k=3):
+    def seleccion_por_torneo(self, k=5):
         indices = np.random.choice(len(self.poblacion), k, replace=False)
         mejor_idx = indices[np.argmax(self.fitnesses[indices])]
         return self.poblacion[mejor_idx]
@@ -24,9 +24,16 @@ class Poblacion:
         h2 = np.concatenate([p2.genes[:punto], p1.genes[punto:]])
         return [Pajaro(h1), Pajaro(h2)]
 
-    def mutacion(self, genes):
-        mascara = np.random.rand(*genes.shape) < MUTATION_RATE
-        ruido = np.random.uniform(-MUTATION_INTENSITY, MUTATION_INTENSITY, genes.shape)
+    def crossover_blend(self, p1, p2, alpha=0.5): #Mezcla un porcentaje de uno con un porcentaje de otro
+        h1 = p1.genes * alpha + p2.genes * (1 - alpha)
+        h2 = p2.genes * alpha + p1.genes * (1 - alpha)
+        return [Pajaro(h1), Pajaro(h2)]
+
+    def mutacion(self, genes, intensity):
+        rate = MUTATION_RATE
+
+        mascara = np.random.rand(*genes.shape) < rate
+        ruido = np.random.uniform(-intensity, intensity, genes.shape)
         nuevos_genes = np.where(mascara, genes + ruido, genes)
         return np.clip(nuevos_genes, -1, 1)
     
@@ -58,13 +65,18 @@ class Poblacion:
             # Seleccionar padres por torneo
             padre1 = self.seleccion_por_torneo()
             padre2 = self.seleccion_por_torneo()
-            
             # Crossover
-            hijos = self.crossover_un_punto(padre1, padre2)
+            hijos = self.crossover_blend(padre1, padre2)
             
             # Mutación y agregar a la nueva población
             for hijo in hijos:
-                hijo.genes = self.mutacion(hijo.genes)
+
+                fitness_promedio_padres = (padre1.fitness + padre2.fitness) / 2
+                factor_reduccion_mutacion = 1.0 / (1.0 + (fitness_promedio_padres / 500))
+                intensidad_minima = 0.01
+                intensidad_mutacion = max(MUTATION_INTENSITY * factor_reduccion_mutacion, intensidad_minima)  # Centila de intensidad minima
+
+                hijo.genes = self.mutacion(hijo.genes, intensidad_mutacion)
                 # Asignar imágenes a los hijos
                 hijo.imagen_vivo = imagen_vivo
                 hijo.imagen_muerto = imagen_muerto
