@@ -9,7 +9,7 @@ class Poblacion:
         self.poblacion = poblacion
         self.fitnesses = np.array([b.fitness for b in self.poblacion])
 
-    def seleccion_por_torneo(self, k=5):
+    def seleccion_por_torneo(self, k=3):
         indices = np.random.choice(len(self.poblacion), k, replace=False)
         mejor_idx = indices[np.argmax(self.fitnesses[indices])]
         return self.poblacion[mejor_idx]
@@ -24,7 +24,7 @@ class Poblacion:
         h2 = np.concatenate([p2.genes[:punto], p1.genes[punto:]])
         return [Pajaro(h1), Pajaro(h2)]
 
-    def crossover_blend(self, p1, p2, alpha=0.5): #Mezcla un porcentaje de uno con un porcentaje de otro
+    def crossover_blend(self, p1, p2, alpha=0.8): #Mezcla un porcentaje de uno con un porcentaje de otro
         h1 = p1.genes * alpha + p2.genes * (1 - alpha)
         h2 = p2.genes * alpha + p1.genes * (1 - alpha)
         return [Pajaro(h1), Pajaro(h2)]
