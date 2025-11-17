@@ -1,6 +1,7 @@
 import pygame
 from config import *
 from game import Juego
+from menu import MenuPrincipal
 
 
 def main():
@@ -10,19 +11,18 @@ def main():
     
     # Crear ventana
     pantalla = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Flappy Bird Genético")
-    
-    # Crear y ejecutar el juego
-    juego = Juego(pantalla)
-    generacion_final, mejor_fitness = juego.run()
+    pygame.display.set_caption("Flappy Bird Genetico")
+
+    menu = MenuPrincipal(pantalla)
+    menu.ejecutar()
+    # generacion_final, mejor_fitness = Juego.run()
     
     # Cerrar Pygame
     pygame.quit()
     
     # Mostrar resultados finales
-    print(f"Generaciones completadas: {generacion_final - 1}")
-    print(f"Mejor fitness alcanzado: {int(mejor_fitness)}")
-
+    # print(f"Generaciones completadas: {generacion_final - 1}")
+    # print(f"Mejor fitness alcanzado: {int(mejor_fitness)}")
 
 
 if __name__ == "__main__":

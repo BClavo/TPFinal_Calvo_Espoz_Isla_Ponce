@@ -41,6 +41,7 @@ VERDE = (0, 255, 0)
 ROJO = (255, 0, 0)
 AZUL = (100, 150, 255)
 AMARILLO = (255, 255, 0)
+NARANJA = (255, 165, 0)
 
 # --- RUTAS DE SPRITES ---
 SPRITE_PATHS = {
@@ -49,5 +50,24 @@ SPRITE_PATHS = {
     'bird': 'sprites/bird1.png',
     'bird_dead': 'sprites/bird2muerto.png',
     'pipe_top': 'sprites/toppipe.png',
-    'pipe_bottom': 'sprites/bottompipe.png'
+    'pipe_bottom': 'sprites/bottompipe.png',
+    'titulo': 'sprites/titulo3.png',
+    'subtitulo': 'sprites/geneticover.png',
+    'jugar': 'sprites/jugar.png',
+    'personalizar': 'sprites/personalizar.png',
+    'salir': 'sprites/salir.png'
+}
+
+# --- RUTAS DEL MENU ---
+
+# --- FUENTES PERSONALIZADAS ---
+FONT_PATHS = {
+    'flappyfont': 'sprites/FlappyBirdy.ttf',
+}
+
+FONT_SIZES = {
+    'titulo': 140,
+    'subtitulo': 50,
+    'texto': 24,
+    'stats': 20
 }
