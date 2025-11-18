@@ -2,6 +2,7 @@
 """
 Archivo de configuración central para el juego Flappy Bird Genético
 """
+import pygame
 
 # --- CONFIGURACIÓN DE PANTALLA ---
 HEIGHT = 600
@@ -9,7 +10,14 @@ WIDTH = 1000
 PANEL_WIDTH = 280
 GAME_WIDTH = 720
 FPS = 60
-
+#--- CONFIGURACIÓN DEL GRAFICO ---
+GRAPH_X = GAME_WIDTH + 30
+GRAPH_Y = 300
+GRAPH_WIDTH = PANEL_WIDTH - 60
+GRAPH_HEIGHT = 150
+GRAPH_RECT = pygame.Rect(GRAPH_X,GRAPH_Y,GRAPH_WIDTH,GRAPH_HEIGHT) #Genera el cuadrado del grafico
+GRAPH_BACKGROUND =  (40,40,50)
+GRAPH_BORDER = (80,80,80)
 # -- CONFIGURACIÓN DE FÍSICA ---
 GRAVITY = 0.5
 FLAP_STRENGTH = -10

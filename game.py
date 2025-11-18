@@ -40,6 +40,7 @@ class Juego:
         self.font_title = pygame.font.Font(None, 36)
         self.font_text = pygame.font.Font(None, 28)
         self.font_small = pygame.font.Font(None, 22)
+        self.font_graph = pygame.font.Font(None,20)
 
 
     def cargar_imagenes(self):
@@ -147,7 +148,7 @@ class Juego:
         self.generation += 1
         self.generar_tuberias_iniciales()
 
-    def dibujar_estadisticas(self):
+    def dibujar_estadisticas_texto(self):
         """Dibuja el panel lateral de estadísticas"""
         pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
         y = 20
@@ -158,11 +159,53 @@ class Juego:
         stats = [
             (f"Generación: {self.generation}", VERDE),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", BLANCO),
-            (f"tuberías pasadas: {tub_pas}", BLANCO)
+            (f"tuberías pasadas: {tub_pas}", BLANCO),
+            (f"Mejor Fitness: {int(self.best_fitness_ever)}", AMARILLO)
         ]
         for text, color in stats:
             self.screen.blit(self.font_text.render(text, True, color), (GAME_WIDTH + 20, y))
             y += 40
+
+    def dibujar_grafico_fitness(self):
+        """Dibuja el grafico de fitness promedio vs generacion"""
+        pygame.draw.rect(self.screen,GRAPH_BACKGROUND,GRAPH_RECT)
+        pygame.draw.rect(self.screen, GRAPH_BORDER,GRAPH_RECT,2,border_radius=5)
+
+        titulo = self.font_small.render("Fitness promedio vs generacion", True, VERDE)
+        self.screen.blit(titulo, (GRAPH_RECT.x, GRAPH_RECT.y - 25)) #Copia el contenido y lo coloca en la pantalla
+
+        data = self.avg_fitness_history #Uso el promedio previo
+        if len(data) < 2:
+            return None #Si es menor a 2 generaciones no puede formar un grafico
+
+        #Eje Y:                                      #}
+        max_fitness = max(data)                      #}
+                                                     #}Normaliza los datos para graficarlos
+        if max_fitness == 0: #}Evita dividir por 0   #}
+            max_fitness = 1  #}                      #}
+                                                     #}
+        #Eje X:
+        number_generations = len(data) - 1
+
+        dots = []
+        for i, fitness in enumerate(data):
+            x = GRAPH_RECT.x + (i/ number_generations) * GRAPH_RECT.width #Se calcula la posicion del punto y se le suma al punto donde inicia el grafico
+            y = GRAPH_RECT.bottom - (fitness/max_fitness) * GRAPH_RECT.height #Le resta al final del grafico segun que tan alto el fitness, colocando el punto mas alto segun su fitness
+
+            dots.append((int(x), int(y)))
+
+        if len(dots) >= 2:
+            pygame.draw.lines(self.screen, AMARILLO, False, dots, 2)
+
+    def dibujar_panel_lateral(self):
+        """Coloca el panel lateral, con el texto y grafico"""
+
+        pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
+        self.dibujar_estadisticas_texto()
+        self.dibujar_grafico_fitness()
+
+
+
 
     def reiniciar(self):
         self.generation = 1
@@ -191,7 +234,7 @@ class Juego:
         for pajaro in sorted(self.pajaros, key=lambda b: b.vivo):
             self.screen.blit(pajaro.image, pajaro.rect)
 
-        self.dibujar_estadisticas()
+        self.dibujar_panel_lateral()
 
     def run(self):
         run = True
