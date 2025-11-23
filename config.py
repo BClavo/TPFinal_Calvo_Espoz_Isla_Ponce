@@ -11,11 +11,12 @@ PANEL_WIDTH = 280
 GAME_WIDTH = 720
 FPS = 60
 #--- CONFIGURACIÓN DEL GRAFICO ---
-GRAPH_X = GAME_WIDTH + 30
-GRAPH_Y = 300
-GRAPH_WIDTH = PANEL_WIDTH - 60
-GRAPH_HEIGHT = 150
+GRAPH_X = GAME_WIDTH + 20
+GRAPH_Y = 255
+GRAPH_WIDTH = PANEL_WIDTH - 40
+GRAPH_HEIGHT = 120
 GRAPH_RECT = pygame.Rect(GRAPH_X,GRAPH_Y,GRAPH_WIDTH,GRAPH_HEIGHT) #Genera el cuadrado del grafico
+GRAPH_RECT_GEN = pygame.Rect(GRAPH_X,GRAPH_Y+GRAPH_HEIGHT+20,GRAPH_WIDTH,GRAPH_HEIGHT)
 GRAPH_BACKGROUND =  (40,40,50)
 GRAPH_BORDER = (80,80,80)
 # -- CONFIGURACIÓN DE FÍSICA ---
@@ -50,6 +51,7 @@ ROJO = (255, 0, 0)
 AZUL = (100, 150, 255)
 AMARILLO = (255, 255, 0)
 NARANJA = (255, 165, 0)
+TURQUESA = (64,224,208)
 
 # --- RUTAS DE SPRITES ---
 SPRITE_PATHS = {
@@ -79,3 +81,15 @@ FONT_SIZES = {
     'texto': 24,
     'stats': 20
 }
+
+# --- CONFIGURACIÓN DE AUDIO ---
+MUSIC_VOLUME = 0.4
+SFX_VOLUME = 0.5
+
+AUDIO_PATHS = {
+    'die' : 'sounds\sfx_die.wav',
+    'hit' : 'sounds\sfx_hit.wav',
+    'point' : 'sounds\sfx_point.wav',
+    'swooshing' : 'sounds\sfx_swooshing.wav',
+    'wing' : 'sounds\sfx_wing.wav',
+    }

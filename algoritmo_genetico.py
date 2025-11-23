@@ -8,6 +8,9 @@ class Poblacion:
     def __init__(self, poblacion):
         self.poblacion = poblacion
         self.fitnesses = np.array([b.fitness for b in self.poblacion])
+        self.genes = np.array([b.genes for b in self.poblacion])
+        self.promedio_genes= np.mean(self.genes,axis=0)
+        self.desviacion_genes = np.std(self.genes,axis=0)
 
     def seleccion_por_torneo(self, k=3):
         indices = np.random.choice(len(self.poblacion), k, replace=False)

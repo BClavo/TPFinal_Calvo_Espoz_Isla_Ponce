@@ -1,7 +1,11 @@
 import pygame
 import random
+import os 
 import numpy as np
-from classes import Pajaro, Tuberia, crear_par_tuberias, Fondo
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt 
+from classes import Pajaro, Tuberia, crear_par_tuberias, Fondo, Graph_manager
 from algoritmo_genetico import Poblacion
 from config import *
 
@@ -42,6 +46,12 @@ class Juego:
         self.font_small = pygame.font.Font(None, 22)
         self.font_graph = pygame.font.Font(None,20)
 
+        # Grafico de genoma 
+        self.graph_gen = Graph_manager()
+
+        # Musicalizacion 
+        self.cargar_audio() 
+
 
     def cargar_imagenes(self):
         """Carga y escala todas las imágenes del juego"""
@@ -60,6 +70,30 @@ class Juego:
         self.cadaver = pygame.image.load(SPRITE_PATHS['bird_dead']).convert_alpha()
         self.cadaver = pygame.transform.scale(self.cadaver, (BIRD_SIZE, BIRD_SIZE))
         # no le apliques alpha global aquí, se aplica en Pajaro.muerte()
+    
+
+    def cargar_audio(self):
+        pygame.mixer.init()
+        pygame.mixer.set_num_channels(15)
+        self.sfx = {}
+        try: 
+            # #Cargar musica 
+            # pygame.mixer.music.load()
+
+            # Cargar Efectos de Sonido (SFX)
+            for name, path in AUDIO_PATHS.items():
+                path = os.path.normpath(path)
+                if name != 'music':
+                    sound = pygame.mixer.Sound(path)
+                    sound.set_volume(SFX_VOLUME)
+                    self.sfx[name] = sound
+            
+            # # Iniciar música de fondo
+            # pygame.mixer.music.play(-1) # El -1 hace que se repita infinitamente
+        
+        except pygame.error as e:
+            print(f"Error al cargar el audio: {e}")
+            print("Asegurate de que los archivos de audio estén en las rutas correctas.")
 
     def inicializar_poblacion(self):
         """Crea la primera generación de pájaros"""
@@ -72,6 +106,8 @@ class Juego:
             self.grupo_pajaros.add(b)
         self.poblacion = Poblacion(self.pajaros)
         self.pajaros_vivos=self.pajaros.copy()
+        self.genes_promedio = self.poblacion.promedio_genes
+        self.desviacion = self.poblacion.desviacion_genes
 
     def generar_nueva_tuberia(self):
         """Genera un nuevo par de tuberías"""
@@ -110,17 +146,39 @@ class Juego:
         if not self.pajaros_vivos:
             return False
         
+        # Flag para controlar la reproducción de efectos de sonido una sola vez 
+        sonido_aleteo_reproducido = False
+        sonido_muerte_reproducido = False
+
         next_pipe = self.obtener_tuberia_cercana()
         for pajaro in self.pajaros_vivos:
-            if not pajaro.vivo:
-                self.pajaros_vivos.remove(pajaro)
-                continue
+            # --- Capturar el estado antes de la actualización ---
+            pajaro_estaba_vivo = pajaro.vivo
+            # if not pajaro.vivo:
+            #     self.pajaros_vivos.remove(pajaro)
+            #     continue
             if next_pipe and pajaro.decision_aleteo(next_pipe):
                 pajaro.aletear()
+                # --- CONTROL DE SONIDO ---
+                if not sonido_aleteo_reproducido:
+                    self.sfx['wing'].play()
+                    sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
             pajaro.actualizar_posicion()
-            pajaro.verificar_colision_tuberia(self.grupo_tuberias)
+            muerte_caida = pajaro.verificar_limite_inferior()
+            colision_tuberia = pajaro.verificar_colision_tuberia(self.grupo_tuberias)
+            
             if next_pipe:
                 pajaro.verificar_tuberia_pasada(next_pipe)
+
+            if pajaro_estaba_vivo and not pajaro.vivo:
+                    if not sonido_muerte_reproducido:
+                            if colision_tuberia:
+                                self.sfx['hit'].play()
+                            elif muerte_caida:
+                                self.sfx['die'].play()
+                            sonido_muerte_reproducido = True # Se reproduce una vez y se desactiva
+            
+        self.pajaros_vivos = [p for p in self.pajaros_vivos if p.vivo]
         return True
 
     def crear_nueva_generacion(self):
@@ -140,6 +198,9 @@ class Juego:
         self.pajaros = self.poblacion.crear_nueva_generacion(
             self.imagen_pajarito, self.cadaver
         )
+        poblacion_hijos_stats = Poblacion(self.pajaros)
+        self.genes_promedio = poblacion_hijos_stats.promedio_genes
+        self.desviacion = poblacion_hijos_stats.desviacion_genes
         self.pajaros_vivos=self.pajaros.copy()
         self.grupo_pajaros.empty()
         for b in self.pajaros:
@@ -197,14 +258,27 @@ class Juego:
         if len(dots) >= 2:
             pygame.draw.lines(self.screen, AMARILLO, False, dots, 2)
 
+    def dibujar_grafico_genes(self):
+        """Dibuja el grafico de promedio y varianza de genes por generación"""
+
+        self.graph_gen.update_graph(self.generation,self.genes_promedio,self.desviacion)
+        graph_surface = self.graph_gen.surface 
+        
+        pygame.draw.rect(self.screen,(16,121,187),GRAPH_RECT_GEN)
+        titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
+        self.screen.blit(titulo, (GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y - 18)) #Copia el contenido y lo coloca en la pantalla
+
+        # Pegar el gráfico dentro del rectángulo
+        self.screen.blit(graph_surface, (GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y))
+
+
     def dibujar_panel_lateral(self):
         """Coloca el panel lateral, con el texto y grafico"""
 
         pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
         self.dibujar_estadisticas_texto()
         self.dibujar_grafico_fitness()
-
-
+        self.dibujar_grafico_genes()
 
 
     def reiniciar(self):

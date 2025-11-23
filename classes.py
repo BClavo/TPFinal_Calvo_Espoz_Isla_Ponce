@@ -1,6 +1,13 @@
 import pygame
 import numpy as np
 from config import *
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt 
+
+def rgb_to_mpl(rgb_tuple):
+    """Convierte tuplas RGB (0-255) a Matplotlib (0.0-1.0)"""
+    return tuple(c / 255.0 for c in rgb_tuple)
 
 class Pajaro(pygame.sprite.Sprite):
     
@@ -74,10 +81,7 @@ class Pajaro(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.rect.top = 0
 
-        # Límite inferior (muerte)
-        if self.rect.bottom >= HEIGHT:
-            self.vivo = False
-            self.muerte()
+        
 
     def calcular_fitness(self):
         """
@@ -116,11 +120,21 @@ class Pajaro(pygame.sprite.Sprite):
         self.image = self.imagen_muerto.copy()
         self.image.set_alpha(51)  # opacidad baja, igual que tu versión original
 
-                
+    def verificar_limite_inferior(self):
+    # Límite inferior (muerte)
+        if self.rect.bottom >= HEIGHT:
+            self.vivo = False
+            self.muerte()          
+            return True 
+        return False  
+    
+    
     def verificar_colision_tuberia(self, grupo_tuberias):
         """Detecta colisión con alguna tubería."""
         if pygame.sprite.spritecollideany(self, grupo_tuberias):
             self.muerte()
+            return True 
+        return False
 
     def verificar_tuberia_pasada(self, tuberia):
         """Detecta si el pájaro ya pasó la tubería."""
@@ -181,3 +195,97 @@ class Fondo:
     def dibujar(self, pantalla):
         pantalla.blit(self.imagen, (self.x1, 0))
         pantalla.blit(self.imagen, (self.x2, 0))
+
+
+class Graph_manager():
+    def __init__(self, size=(GRAPH_WIDTH,GRAPH_HEIGHT), labels=["w0", "w1(Δy)", "w2(Δy²)", "w3(Δx)", "w4(Δx²)", "w5(vy)"], 
+                 title="Genome (Avg ± Std)"):
+        self.size = size
+        self.labels = labels
+        self.title = title
+
+        self.surface = None
+        self.last_generation = None
+
+        # Crear figura y eje una sola vez (optimización grande)
+        fig_w = size[0] / 100
+        fig_h = size[1] / 100
+        self.fig, self.ax = plt.subplots(figsize=(fig_w, fig_h), dpi=100)
+
+        # Estética base (no se repite cada vez)
+        self.ax.set_title(self.title, fontsize=10)
+        self.ax.axvline(0, color="white", linewidth=1)
+        self.ax.grid(axis="x", alpha=0.2)
+    
+
+    def update_graph(self, generation, means, stds):
+        """
+        Genera la Surface SOLO si cambia de generación.
+        """
+        if generation == self.last_generation:
+            return  # nada que actualizar
+
+        self.last_generation = generation
+
+        self.ax.clear()  # limpiar gráfico anterior
+        self.fig.patch.set_facecolor(rgb_to_mpl(GRAPH_BACKGROUND)) 
+        self.ax.set_facecolor(rgb_to_mpl(GRAPH_BACKGROUND)) #  color de fondo definido en config
+
+        n = len(means)
+        y = np.arange(n)
+
+        for i in range(n):
+            mean = means[i]
+            std = stds[i]
+
+            total_std_width = 2 * std
+            start_pos = mean - std
+            
+            # Determinar el color de la media (para superponer)
+            mean_color = "green" if mean >= 0 else "red"
+
+            self.ax.barh(i, total_std_width, 
+                left=start_pos, color="gray", 
+                alpha=0.4
+            )
+            
+            # Dibujar media sobre la barra gris (Barra Verde/Roja)
+            self.ax.barh(i, abs(mean), left=min(0, mean), 
+                color=mean_color, alpha=0.9)
+
+            # texto numérico
+            self.ax.text(
+                -0.9,
+                i,
+                f"{mean:.2f}",
+                va="center",
+                fontsize=8,
+                color="white"
+            )
+
+        # Etiquetas y estética
+        self.ax.set_yticks(y)
+        self.ax.set_yticklabels(self.labels,fontsize=10)
+        # self.ax.set_title(self.title, fontsize=10)
+        self.ax.axvline(0, color="white", linewidth=1)
+        self.ax.grid(axis="x", alpha=0.2)
+        # Margen vertical para separar barras de bordes up/down
+        self.ax.set_xlim(min(self.ax.get_xlim()[0], -1), max(self.ax.get_xlim()[1], 1))
+
+        # --- CONFIGURAR EL COLOR DE LAS ETIQUETAS DE LOS EJES ---
+        self.ax.tick_params(axis='y', colors='turquoise') 
+        self.ax.tick_params(axis='x', colors='turquoise')
+
+        # Ajustar para que no se corte nada
+        self.fig.subplots_adjust(left=0.3, right=0.95, top=0.95, bottom=0.20)
+
+        # Renderizado en memoria
+        self.fig.canvas.draw()
+        raw_data = self.fig.canvas.buffer_rgba()
+
+        w, h = self.fig.canvas.get_width_height()
+
+        # Crear Surface de pygame (rápido)
+        self.surface = pygame.image.frombuffer(raw_data, (w, h), "RGBA").convert()
+
+        return self.surface 
