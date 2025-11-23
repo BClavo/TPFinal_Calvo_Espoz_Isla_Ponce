@@ -197,7 +197,8 @@ class MenuPrincipal:
             juego.run()
             self.mostrar_modo_juego = False
         elif self.boton_clasico.click(mouse_pos):
-            print("Modo clásico aún no implementado.")
+            juego = Juego(self.pantalla, "clasico")
+            juego.run()
             self.mostrar_modo_juego = False
 
 

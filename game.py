@@ -12,9 +12,10 @@ from config import *
 class Juego:
     """Clase principal que maneja toda la lógica del juego Flappy Bird Genético."""
 
-    def __init__(self, screen):
+    def __init__(self, screen,modo="simulador"):
         self.screen = screen
         self.clock = pygame.time.Clock()
+        self.modo = modo
 
         # Cargar imágenes
         self.cargar_imagenes()
@@ -34,7 +35,9 @@ class Juego:
         # Estado del juego
         self.generation = 1
         self.best_fitness_ever = 0
+        self.max_pipes_ever= 0
         self.avg_fitness_history = []
+        self.max_pipes_history= []
         self.distancia_acumulada = 0
 
         # Inicializar tuberías
@@ -52,7 +55,9 @@ class Juego:
         # Musicalizacion 
         self.cargar_audio() 
 
+        self.espacio=False
 
+        
     def cargar_imagenes(self):
         """Carga y escala todas las imágenes del juego"""
         self.fondo_juego = pygame.image.load(SPRITE_PATHS['fondo']).convert_alpha()
@@ -97,10 +102,15 @@ class Juego:
 
     def inicializar_poblacion(self):
         """Crea la primera generación de pájaros"""
-        self.pajaros = [
+        if self.modo=="simulador":
+            self.pajaros = [
             Pajaro(imagen_vivo=self.imagen_pajarito, imagen_muerto=self.cadaver)
             for _ in range(NUM_PAJAROS)
         ]
+        else:
+            self.pajaros = [
+            Pajaro(imagen_vivo=self.imagen_pajarito, imagen_muerto=self.cadaver)
+            ]
         self.grupo_pajaros.empty()
         for b in self.pajaros:
             self.grupo_pajaros.add(b)
@@ -151,18 +161,26 @@ class Juego:
         sonido_muerte_reproducido = False
 
         next_pipe = self.obtener_tuberia_cercana()
-        for pajaro in self.pajaros_vivos:
-            # --- Capturar el estado antes de la actualización ---
+        for pajaro in self.pajaros_vivos:  
+        # --- Capturar el estado antes de la actualización ---
             pajaro_estaba_vivo = pajaro.vivo
             # if not pajaro.vivo:
             #     self.pajaros_vivos.remove(pajaro)
             #     continue
-            if next_pipe and pajaro.decision_aleteo(next_pipe):
-                pajaro.aletear()
-                # --- CONTROL DE SONIDO ---
-                if not sonido_aleteo_reproducido:
-                    self.sfx['wing'].play()
-                    sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
+            if self.modo=="simulador" :
+                if next_pipe and pajaro.decision_aleteo(next_pipe):
+                    pajaro.aletear()
+                    # --- CONTROL DE SONIDO ---
+                    if not sonido_aleteo_reproducido:
+                        self.sfx['wing'].play()
+                        sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
+            elif self.modo=="clasico":
+                if self.espacio:
+                    pajaro.aletear()
+                    self.espacio=False
+                    if not sonido_aleteo_reproducido:
+                        self.sfx['wing'].play()
+                        sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
             pajaro.actualizar_posicion()
             muerte_caida = pajaro.verificar_limite_inferior()
             colision_tuberia = pajaro.verificar_colision_tuberia(self.grupo_tuberias)
@@ -188,21 +206,33 @@ class Juego:
 
         current_best = max(b.fitness for b in self.pajaros)
         current_avg = sum(b.fitness for b in self.pajaros) / len(self.pajaros)
+        current_pipes= max(b.tuberias_pasadas for b in self.pajaros)
 
         if current_best > self.best_fitness_ever:
             self.best_fitness_ever = current_best
+        
+        if current_pipes > self.max_pipes_ever:
+            self.max_pipes_ever = current_pipes
 
         self.avg_fitness_history.append(current_avg)
+        self.max_pipes_history.append(current_pipes)
 
-        self.poblacion = Poblacion(self.pajaros)
-        self.pajaros = self.poblacion.crear_nueva_generacion(
-            self.imagen_pajarito, self.cadaver
-        )
-        poblacion_hijos_stats = Poblacion(self.pajaros)
-        self.genes_promedio = poblacion_hijos_stats.promedio_genes
-        self.desviacion = poblacion_hijos_stats.desviacion_genes
-        self.pajaros_vivos=self.pajaros.copy()
-        self.grupo_pajaros.empty()
+        if self.modo=="simulador":
+            self.poblacion = Poblacion(self.pajaros)
+            self.pajaros = self.poblacion.crear_nueva_generacion(
+                self.imagen_pajarito, self.cadaver
+            )
+            poblacion_hijos_stats = Poblacion(self.pajaros)
+            self.genes_promedio = poblacion_hijos_stats.promedio_genes
+            self.desviacion = poblacion_hijos_stats.desviacion_genes
+            self.pajaros_vivos=self.pajaros.copy()
+            self.grupo_pajaros.empty()
+        elif self.modo=="clasico":
+            self.pajaros= [Pajaro(imagen_vivo=self.imagen_pajarito, imagen_muerto=self.cadaver)]
+            self.pajaros_vivos=self.pajaros.copy()
+            self.grupo_pajaros.empty()
+
+            
         for b in self.pajaros:
             self.grupo_pajaros.add(b)
 
@@ -221,7 +251,7 @@ class Juego:
             (f"Generación: {self.generation}", VERDE),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", BLANCO),
             (f"tuberías pasadas: {tub_pas}", BLANCO),
-            (f"Mejor Fitness: {int(self.best_fitness_ever)}", AMARILLO)
+            (f"Mejor Fitness: {int(self.best_fitness_ever)}", AMARILLO) if self.modo=="simulador" else (f"Max tuberias:{int(self.max_pipes_ever)}", AMARILLO)
         ]
         for text, color in stats:
             self.screen.blit(self.font_text.render(text, True, color), (GAME_WIDTH + 20, y))
@@ -232,10 +262,14 @@ class Juego:
         pygame.draw.rect(self.screen,GRAPH_BACKGROUND,GRAPH_RECT)
         pygame.draw.rect(self.screen, GRAPH_BORDER,GRAPH_RECT,2,border_radius=5)
 
-        titulo = self.font_small.render("Fitness promedio vs generacion", True, VERDE)
+        if self.modo=="simulador":
+            titulo = self.font_small.render("Fitness promedio vs generacion", True, VERDE)
+        elif self.modo=="clasico":
+            titulo = self.font_small.render("Tuberias vs ronda jugada", True, VERDE)
+
         self.screen.blit(titulo, (GRAPH_RECT.x, GRAPH_RECT.y - 25)) #Copia el contenido y lo coloca en la pantalla
 
-        data = self.avg_fitness_history #Uso el promedio previo
+        data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history #Uso el promedio previo
         if len(data) < 2:
             return None #Si es menor a 2 generaciones no puede formar un grafico
 
@@ -276,15 +310,18 @@ class Juego:
         """Coloca el panel lateral, con el texto y grafico"""
 
         pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
+        
         self.dibujar_estadisticas_texto()
         self.dibujar_grafico_fitness()
-        self.dibujar_grafico_genes()
+        if self.modo=="simulador":
+            self.dibujar_grafico_genes()
 
 
     def reiniciar(self):
         self.generation = 1
         self.best_fitness_ever = 0
         self.avg_fitness_history = []
+        self.max_pipes_history=[]
         self.inicializar_poblacion()
         self.generar_tuberias_iniciales()
 
@@ -323,7 +360,10 @@ class Juego:
                     elif event.key == pygame.K_r:
                         self.reiniciar()
                     elif event.key == pygame.K_SPACE:
-                        self.forzar_siguiente_generacion()
+                        if self.modo=="simulador":
+                            self.forzar_siguiente_generacion()
+                        elif self.modo=="clasico":
+                            self.espacio=True
             self.actualizar()
             self.draw()
             pygame.display.flip()
