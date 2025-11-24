@@ -21,7 +21,7 @@ def main():
     pygame.quit()
     
     # Mostrar resultados finales
-    # print(f"Generaciones completadas: {generacion_final - 1}")
+    # print(f"Generaciones completadas: {generación_final - 1}")
     # print(f"Mejor fitness alcanzado: {int(mejor_fitness)}")
 
 

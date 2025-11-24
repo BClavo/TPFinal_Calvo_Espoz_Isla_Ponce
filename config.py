@@ -2,6 +2,8 @@
 """
 Archivo de configuración central para el juego Flappy Bird Genético
 """
+import os.path
+
 import pygame
 
 # --- CONFIGURACIÓN DE PANTALLA ---
@@ -87,9 +89,9 @@ MUSIC_VOLUME = 0.4
 SFX_VOLUME = 0.5
 
 AUDIO_PATHS = {
-    'die' : 'sounds\sfx_die.wav',
-    'hit' : 'sounds\sfx_hit.wav',
-    'point' : 'sounds\sfx_point.wav',
-    'swooshing' : 'sounds\sfx_swooshing.wav',
-    'wing' : 'sounds\sfx_wing.wav',
+    'die' :  os.path.join("sounds","sfx_die.wav"),
+    'hit' :  os.path.join("sounds","sfx_hit.wav" ),
+    'point' : os.path.join("sounds","sfx_point.wav" ),
+    'swooshing' : os.path.join("sounds","sfx_swooshing.wav" ),
+    'wing' : os.path.join("sounds","sfx_wing.wav" )
     }
