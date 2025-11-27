@@ -38,7 +38,7 @@ class Poblacion:
         mascara = np.random.rand(*genes.shape) < rate
         ruido = np.random.uniform(-intensity, intensity, genes.shape)
         nuevos_genes = np.where(mascara, genes + ruido, genes)
-        return np.clip(nuevos_genes, -1, 1)
+        return np.clip(nuevos_genes, -3, 3)
     
     def crear_nueva_generacion(self, imagen_vivo=None, imagen_muerto=None):
         """

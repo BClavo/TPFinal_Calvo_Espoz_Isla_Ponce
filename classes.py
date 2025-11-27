@@ -14,7 +14,7 @@ class Pajaro(pygame.sprite.Sprite):
     def __init__(self, genes=None, imagen_vivo=None, imagen_muerto=None):
         super().__init__()
         # Genética: 6 pesos para la red neuronal
-        self.genes = genes if genes is not None else np.random.uniform(-1, 1, 6)
+        self.genes = genes if genes is not None else np.random.uniform(-3, 3, 6)
         
         # Imágenes
         self.imagen_vivo = imagen_vivo
