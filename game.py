@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt 
-from classes import Pajaro, Tuberia, crear_par_tuberias, Fondo, Graph_manager
+from classes import Pajaro, Tuberia, crear_par_tuberias, Fondo, Graph_manager, SoundManager
 from algoritmo_genetico import Poblacion
 from config import *
 
@@ -54,7 +54,7 @@ class Juego:
         self.graph_gen = Graph_manager()
 
         # Musicalizacion 
-        self.cargar_audio() 
+        self.sound_manager = SoundManager() 
 
         self.espacio=False
 
@@ -77,29 +77,6 @@ class Juego:
         self.cadaver = pygame.transform.scale(self.cadaver, (BIRD_SIZE, BIRD_SIZE))
         # no le apliques alpha global aquí, se aplica en Pajaro.muerte()
     
-
-    def cargar_audio(self):
-        pygame.mixer.init()
-        pygame.mixer.set_num_channels(15)
-        self.sfx = {}
-        try: 
-            # #Cargar musica 
-            # pygame.mixer.music.load()
-
-            # Cargar Efectos de Sonido (SFX)
-            for name, path in AUDIO_PATHS.items():
-                path = os.path.normpath(path)
-                if name != 'music':
-                    sound = pygame.mixer.Sound(path)
-                    sound.set_volume(SFX_VOLUME)
-                    self.sfx[name] = sound
-            
-            # # Iniciar música de fondo
-            # pygame.mixer.music.play(-1) # El -1 hace que se repita infinitamente
-        
-        except pygame.error as e:
-            print(f"Error al cargar el audio: {e}")
-            print("Asegurate de que los archivos de audio estén en las rutas correctas.")
 
     def inicializar_poblacion(self):
         """Crea la primera generación de pájaros"""
@@ -158,7 +135,6 @@ class Juego:
             return False
         
         # Flag para controlar la reproducción de efectos de sonido una sola vez 
-        sonido_aleteo_reproducido = False
         sonido_muerte_reproducido = False
 
         next_pipe = self.obtener_tuberia_cercana()
@@ -172,16 +148,12 @@ class Juego:
                 if next_pipe and pajaro.decision_aleteo(next_pipe):
                     pajaro.aletear()
                     # --- CONTROL DE SONIDO ---
-                    if not sonido_aleteo_reproducido:
-                        self.sfx['wing'].play()
-                        sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
+                    self.sound_manager.play_sfx_limited('wing')
             elif self.modo=="clasico":
                 if self.espacio:
                     pajaro.aletear()
                     self.espacio=False
-                    if not sonido_aleteo_reproducido:
-                        self.sfx['wing'].play()
-                        sonido_aleteo_reproducido = True # Se reproduce una vez y se desactiva
+                    self.sound_manager.play_sfx_limited('wing')
             pajaro.actualizar_posicion()
             muerte_caida = pajaro.verificar_limite_inferior()
             colision_tuberia = pajaro.verificar_colision_tuberia(self.grupo_tuberias)
@@ -192,9 +164,9 @@ class Juego:
             if pajaro_estaba_vivo and not pajaro.vivo:
                     if not sonido_muerte_reproducido:
                             if colision_tuberia:
-                                self.sfx['hit'].play()
+                                self.sound_manager.play_sfx_limited('hit')
                             elif muerte_caida:
-                                self.sfx['die'].play()
+                                self.sound_manager.play_sfx('die')
                             sonido_muerte_reproducido = True # Se reproduce una vez y se desactiva
             
         self.pajaros_vivos = [p for p in self.pajaros_vivos if p.vivo]

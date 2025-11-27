@@ -289,3 +289,74 @@ class Graph_manager():
         self.surface = pygame.image.frombuffer(raw_data, (w, h), "RGBA").convert()
 
         return self.surface 
+
+
+class SoundManager:
+    """Maneja la carga, reproducción y control de efectos de sonido."""
+
+    def __init__(self):
+        pygame.mixer.init()
+        # Inicializa un número de canales (de config.py)
+        pygame.mixer.set_num_channels(15) 
+        self.sfx = {}
+
+        # Cooldown para el sonido 'wing' para evitar saturación (en milisegundos)
+        # 80ms limita el sonido a ~12 veces por segundo, lo que es mucho más limpio.
+        self.wing_cooldown_ms = 80 
+        self.hit_cooldown_ms = 150
+        self.sfx_cooldowns = {}
+        self.cargar_audio()
+
+    def cargar_audio(self):
+        try:
+            # #Cargar musica 
+            # pygame.mixer.music.load()
+
+            #cargar efectos de sonido
+            for name, path in AUDIO_PATHS.items():
+                path = os.path.normpath(path)
+                if name != 'music':
+                    sound = pygame.mixer.Sound(path)
+                    sound.set_volume(SFX_VOLUME)
+                    # Opcional: Reducir el volumen del aleteo (flap) solo para el simulador
+                    if name == 'wing':
+                        sound.set_volume(SFX_VOLUME * 0.5) 
+                    self.sfx[name] = sound
+        
+        except pygame.error as e:
+            print(f"Error al cargar el audio en SoundManager: {e}")
+            print("Asegurate de que los archivos de audio estén en las rutas correctas.")
+
+    def play_sfx(self, name):
+        """Reproduce un SFX inmediatamente."""
+        if name in self.sfx:
+            self.sfx[name].play()
+            
+    def play_sfx_limited(self, name, cooldown_ms=None):
+        """
+        Reproduce un SFX limitado por un cooldown. 
+        Si no se especifica cooldown, usa el default (wing o hit).
+        """
+        if name not in self.sfx:
+            return
+        
+        # Asigna el cooldown según el nombre del SFX
+        if name == 'wing':
+            cooldown = self.wing_cooldown_ms
+        elif name == 'hit':
+            cooldown = self.hit_cooldown_ms
+        elif cooldown_ms is not None:
+            cooldown = cooldown_ms
+        else:
+            # Si no tiene cooldown configurado, lo reproduce inmediatamente
+            self.play_sfx(name) 
+            return
+        current_time = pygame.time.get_ticks()
+        
+        # Comprueba si ha pasado el tiempo de espera desde el último play
+        if name not in self.sfx_cooldowns or \
+           current_time - self.sfx_cooldowns[name] > cooldown:
+            
+            self.play_sfx(name)
+            self.sfx_cooldowns[name] = current_time # Actualiza el tiempo  
+          
