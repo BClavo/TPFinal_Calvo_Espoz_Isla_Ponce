@@ -15,6 +15,7 @@ class Juego:
     def __init__(self, screen,modo="simulador"):
         self.screen = screen
         self.clock = pygame.time.Clock()
+        self.fps= FPS
         self.modo = modo
 
         # Cargar imágenes
@@ -306,6 +307,14 @@ class Juego:
         self.screen.blit(graph_surface, (GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y))
 
 
+    def dibujar_velocidad(self):
+        
+        multiplicador= "X1" if self.clock.get_fps() <90 else "X2"
+        pygame.draw.rect(self.screen, (100,100,100), (GRAPH_X, SPEED_Y, 40, 40))
+        texto=self.font_text.render(f"{multiplicador}",True, BLANCO)
+        self.screen.blit(texto, (GRAPH_X +10 , SPEED_Y + 10))
+
+
     def dibujar_panel_lateral(self):
         """Coloca el panel lateral, con el texto y grafico"""
 
@@ -315,6 +324,7 @@ class Juego:
         self.dibujar_grafico_fitness()
         if self.modo=="simulador":
             self.dibujar_grafico_genes()
+            self.dibujar_velocidad()
 
 
     def reiniciar(self):
@@ -350,7 +360,7 @@ class Juego:
     def run(self):
         run = True
         while run and self.generation <= MAX_GENERATIONS:
-            self.clock.tick(FPS)
+            self.clock.tick(self.fps)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -364,6 +374,12 @@ class Juego:
                             self.forzar_siguiente_generacion()
                         elif self.modo=="clasico":
                             self.espacio=True
+                    elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
+                        if self.modo=="simulador":
+                            if self.clock.get_fps()<90:
+                                self.fps*=2
+                            elif self.clock.get_fps()>90:
+                                self.fps=FPS
             self.actualizar()
             self.draw()
             pygame.display.flip()
