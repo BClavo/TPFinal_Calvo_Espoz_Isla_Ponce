@@ -90,6 +90,7 @@ MUSIC_VOLUME = 0.4
 SFX_VOLUME = 0.5
 
 AUDIO_PATHS = {
+    'game_music' : os.path.join("sounds","music.ogg"),
     'die' :  os.path.join("sounds","sfx_die.wav"),
     'hit' :  os.path.join("sounds","sfx_hit.wav" ),
     'point' : os.path.join("sounds","sfx_point.wav" ),

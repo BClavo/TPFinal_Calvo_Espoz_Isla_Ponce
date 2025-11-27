@@ -309,23 +309,24 @@ class SoundManager:
 
     def cargar_audio(self):
         try:
-            # #Cargar musica 
-            # pygame.mixer.music.load()
-
             #cargar efectos de sonido
             for name, path in AUDIO_PATHS.items():
                 path = os.path.normpath(path)
                 if name != 'music':
                     sound = pygame.mixer.Sound(path)
                     sound.set_volume(SFX_VOLUME)
-                    # Opcional: Reducir el volumen del aleteo (flap) solo para el simulador
-                    if name == 'wing':
-                        sound.set_volume(SFX_VOLUME * 0.5) 
                     self.sfx[name] = sound
         
         except pygame.error as e:
             print(f"Error al cargar el audio en SoundManager: {e}")
             print("Asegurate de que los archivos de audio estén en las rutas correctas.")
+        
+        # Guardar Paths de Música (para usar con pygame.mixer.music)
+        self.music_paths = {
+            'game_music': AUDIO_PATHS.get('game_music')
+            # 'menu_music': AUDIO_PATHS.get('menu_music'),
+        }
+        pygame.mixer.music.set_volume(MUSIC_VOLUME)
 
     def play_sfx(self, name):
         """Reproduce un SFX inmediatamente."""
@@ -359,4 +360,24 @@ class SoundManager:
             
             self.play_sfx(name)
             self.sfx_cooldowns[name] = current_time # Actualiza el tiempo  
-          
+    
+    def play_music(self, name, loop=-1):
+        """Carga y reproduce música. loop=-1 para repetición infinita."""
+        path = self.music_paths[name]
+        if path and os.path.exists(path):
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.play(loop)
+        elif path is None:
+             print(f"Error: No se encontró la ruta para la música '{name}'")
+    
+    def stop_music(self):
+        """Detiene la reproducción de la música."""
+        pygame.mixer.music.stop()
+        
+    def pause_music(self):
+        """Pausa la reproducción de la música."""
+        pygame.mixer.music.pause()
+        
+    def unpause_music(self):
+        """Reanuda la reproducción de la música."""
+        pygame.mixer.music.unpause()

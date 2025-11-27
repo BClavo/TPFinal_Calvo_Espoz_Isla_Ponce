@@ -55,6 +55,7 @@ class Juego:
 
         # Musicalizacion 
         self.sound_manager = SoundManager() 
+        self.sound_manager.play_music('game_music') # <-- Inicia la música del juego
 
         self.espacio=False
 
