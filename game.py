@@ -137,14 +137,12 @@ class Juego:
         
         # Flag para controlar la reproducción de efectos de sonido una sola vez 
         sonido_muerte_reproducido = False
+        sonido_tuberia_pasada = False 
 
         next_pipe = self.obtener_tuberia_cercana()
         for pajaro in self.pajaros_vivos:  
         # --- Capturar el estado antes de la actualización ---
             pajaro_estaba_vivo = pajaro.vivo
-            # if not pajaro.vivo:
-            #     self.pajaros_vivos.remove(pajaro)
-            #     continue
             if self.modo=="simulador" :
                 if next_pipe and pajaro.decision_aleteo(next_pipe):
                     pajaro.aletear()
@@ -160,7 +158,11 @@ class Juego:
             colision_tuberia = pajaro.verificar_colision_tuberia(self.grupo_tuberias)
             
             if next_pipe:
-                pajaro.verificar_tuberia_pasada(next_pipe)
+                tuberia_pasada = pajaro.verificar_tuberia_pasada(next_pipe)
+                if not sonido_tuberia_pasada:
+                    if tuberia_pasada and pajaro.tuberias_pasadas!=0:
+                        self.sound_manager.play_sfx('point')
+                        sonido_tuberia_pasada = True 
 
             if pajaro_estaba_vivo and not pajaro.vivo:
                     if not sonido_muerte_reproducido:

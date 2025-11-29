@@ -29,7 +29,7 @@ class Pajaro(pygame.sprite.Sprite):
 
     def __init__(self, genes=None, imagen_vivo=None, imagen_muerto=None):
         super().__init__()
-        self.genes = genes if genes is not None else np.random.uniform(-3, 3, 6)
+        self.genes = genes if genes is not None else np.random.uniform(-2, 2, 6)
 
         self.imagen_vivo = imagen_vivo
         self.imagen_muerto = imagen_muerto
@@ -169,6 +169,8 @@ class Pajaro(pygame.sprite.Sprite):
         if self.ultima_tuberia_pasada != tuberia.id_tuberia:
             self.tuberias_pasadas += 1
             self.ultima_tuberia_pasada = tuberia.id_tuberia
+            return True 
+        return False
 
 
 class Tuberia(pygame.sprite.Sprite):

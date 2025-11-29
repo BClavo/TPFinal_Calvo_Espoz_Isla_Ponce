@@ -16,7 +16,7 @@ class Poblacion:
         self.promedio_genes = np.mean(self.genes, axis=0)
         self.desviacion_genes = np.std(self.genes, axis=0)
 
-    def seleccion_por_torneo(self, k: int = 3):
+    def seleccion_por_torneo(self, k: int = 5):
         """Selecciona el mejor pájaro dentro de un torneo aleatorio de tamaño ``k``.
 
         Args:
@@ -83,9 +83,9 @@ class Poblacion:
         """
         rate = MUTATION_RATE
         mascara = np.random.rand(*genes.shape) < rate
-        ruido = np.random.uniform(-intensity, intensity, genes.shape)
+        ruido = np.random.normal(0, intensity, genes.shape)
         nuevos_genes = np.where(mascara, genes + ruido, genes)
-        return np.clip(nuevos_genes, -3, 3)
+        return np.clip(nuevos_genes, -2, 2)
 
     def crear_nueva_generacion(self, imagen_vivo=None, imagen_muerto=None):
         """Crea una nueva generación aplicando elitismo, selección, crossover y mutación.

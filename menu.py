@@ -1,6 +1,7 @@
 import pygame
 from config import *
 from game import Juego
+from classes import SoundManager
 
 class Boton:
     """Botón genérico con texto y detección de click.
