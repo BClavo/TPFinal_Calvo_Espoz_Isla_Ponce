@@ -285,6 +285,8 @@ class Juego:
             (f"Distancia actual: {distancia_actual}", BLANCO),
             (f"Distancia promedio: {int(self.promedio_distancia_history[-1]) if self.promedio_distancia_history else 0}", BLANCO),
             (f"Mejor distancia: {self.mejor_distancia}", AMARILLO),
+            (f"Mejor fitness: {self.best_fitness_ever}", AMARILLO),
+
         ]
         
         for item in stats:
@@ -294,7 +296,7 @@ class Juego:
             text, color = item
             rendered = self.font_text.render(text, True, color)
             self.screen.blit(rendered, (GAME_WIDTH + 15, y))
-            y += 28  # Reducido de 32 a 28 para dar más espacio abajo
+            y += 24  # Reducido de 32 a 28 para dar más espacio abajo
 
     def dibujar_grafico_fitness(self):
         """Dibuja el grafico de fitness promedio vs generacion"""
