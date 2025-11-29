@@ -123,29 +123,29 @@ class MenuPrincipal:
         pantalla (pygame.Surface): Pantalla donde se renderiza.
     """
 
-    def __init__(self, pantalla):
+    def __init__(self, pantalla, estilo="default"):
         self.pantalla = pantalla
         self.clock = pygame.time.Clock()
         self.fuente_titulo = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['titulo'])
         self.fuente_pregunta = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['subtitulo'])
         self.running = True
 
-        self.boton_play = BotonImagen(WIDTH // 2 - 110, 320, SPRITE_PATHS['jugar'])
-        self.boton_personalizar = BotonImagen(WIDTH // 2 - 110, 410, SPRITE_PATHS['personalizar'])
-        self.boton_salir = BotonImagen(WIDTH // 2 - 110, 500, SPRITE_PATHS['salir'])
+        self.boton_play = BotonImagen(WIDTH // 4 - 110 , 440, SPRITE_PATHS['jugar'])
+        self.boton_personalizar = BotonImagen(WIDTH // 2 - 110, 440, SPRITE_PATHS['personalizar'])
+        self.boton_salir = BotonImagen(WIDTH*3 // 4 - 110, 440, SPRITE_PATHS['salir'])
 
-        self.fondo = pygame.image.load(SPRITE_PATHS['fondo']).convert()
+        self.estilo= estilo
+        self.fondo = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
         self.fondo = pygame.transform.scale(self.fondo, (WIDTH, HEIGHT))
 
-        self.titulo_img = pygame.image.load(SPRITE_PATHS['titulo']).convert_alpha()
-        self.titulo_img = pygame.transform.scale(self.titulo_img, (600, 150))
-        self.titulo_rect = self.titulo_img.get_rect(center=(WIDTH // 2, 140))
+        # self.titulo_img = pygame.image.load(SPRITE_PATHS['titulo']).convert_alpha()
+        # self.titulo_img = pygame.transform.scale(self.titulo_img, (600, 150))
+        # self.titulo_rect = self.titulo_img.get_rect(center=(WIDTH // 2, 140))
 
-        self.subtitulo_img = pygame.image.load(SPRITE_PATHS['subtitulo']).convert_alpha()
-        self.subtitulo_img = pygame.transform.scale(self.subtitulo_img, (400, 100))
-        self.subtitulo_rect = self.subtitulo_img.get_rect(
-            center=(self.titulo_rect.centerx + 80, self.titulo_rect.bottom + 10)
-        )
+        # self.subtitulo_img = pygame.image.load(SPRITE_PATHS['subtitulo']).convert_alpha()
+        # self.subtitulo_img = pygame.transform.scale(self.subtitulo_img, (400, 100))
+        # self.subtitulo_rect = self.subtitulo_img.get_rect(
+        #     center=(self.titulo_rect.centerx + 80, self.titulo_rect.bottom + 10))
 
         self.icono_tuerca = pygame.image.load("sprites/gear.png").convert_alpha()
         self.icono_tuerca = pygame.transform.scale(self.icono_tuerca, (60, 60))
@@ -197,8 +197,8 @@ class MenuPrincipal:
     def dibujar(self) -> None:
         """Dibuja todos los elementos del menú."""
         self.pantalla.blit(self.fondo, (0, 0))
-        self.pantalla.blit(self.titulo_img, self.titulo_rect)
-        self.pantalla.blit(self.subtitulo_img, self.subtitulo_rect)
+        #self.pantalla.blit(self.titulo_img, self.titulo_rect)
+        #self.pantalla.blit(self.subtitulo_img, self.subtitulo_rect)
 
         self.boton_play.dibujar(self.pantalla)
         self.boton_personalizar.dibujar(self.pantalla)
@@ -247,12 +247,12 @@ class MenuPrincipal:
         """Gestiona el click en la selección de modo."""
         if self.boton_simulador.click(mouse_pos):
             self.sound_manager.play_sfx('click')
-            juego = Juego(self.pantalla)
+            juego = Juego(self.pantalla,estilo=self.estilo)
             juego.run()
             self.mostrar_modo_juego = False
         elif self.boton_clasico.click(mouse_pos):
             self.sound_manager.play_sfx('click')
-            juego = Juego(self.pantalla, "clasico")
+            juego = Juego(self.pantalla, "clasico",self.estilo)
             juego.run()
             self.mostrar_modo_juego = False
 

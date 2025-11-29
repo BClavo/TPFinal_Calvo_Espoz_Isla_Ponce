@@ -12,11 +12,12 @@ from config import *
 class Juego:
     """Clase principal que maneja toda la lógica del juego Flappy Bird Genético."""
 
-    def __init__(self, screen,modo="simulador"):
+    def __init__(self, screen,modo="simulador", estilo="default"):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.fps= FPS
         self.modo = modo
+        self.estilo=estilo
         self.game_over = False
 
         # Cargar imágenes
@@ -69,19 +70,19 @@ class Juego:
         
     def cargar_imagenes(self):
         """Carga y escala todas las imágenes del juego"""
-        self.fondo_juego = pygame.image.load(SPRITE_PATHS['fondo']).convert_alpha()
+        self.fondo_juego = pygame.image.load(SPRITE_PATHS[self.estilo]['fondo']).convert_alpha()
         self.fondo_juego = pygame.transform.scale(self.fondo_juego, (GAME_WIDTH, HEIGHT))
 
-        self.imagen_pajarito = pygame.image.load(SPRITE_PATHS['bird']).convert_alpha()
+        self.imagen_pajarito = pygame.image.load(SPRITE_PATHS[self.estilo]['bird']).convert_alpha()
         self.imagen_pajarito = pygame.transform.scale(self.imagen_pajarito, (BIRD_SIZE, BIRD_SIZE))
 
-        self.top_pipe_image = pygame.image.load(SPRITE_PATHS['pipe_top']).convert_alpha()
+        self.top_pipe_image = pygame.image.load(SPRITE_PATHS[self.estilo]['pipe_top']).convert_alpha()
         self.top_pipe_image = pygame.transform.scale(self.top_pipe_image, (PIPE_WIDTH, HEIGHT))
 
-        self.bottom_pipe_image = pygame.image.load(SPRITE_PATHS['pipe_bottom']).convert_alpha()
+        self.bottom_pipe_image = pygame.image.load(SPRITE_PATHS[self.estilo]['pipe_bottom']).convert_alpha()
         self.bottom_pipe_image = pygame.transform.scale(self.bottom_pipe_image, (PIPE_WIDTH, HEIGHT))
 
-        self.cadaver = pygame.image.load(SPRITE_PATHS['bird_dead']).convert_alpha()
+        self.cadaver = pygame.image.load(SPRITE_PATHS[self.estilo]['bird_dead']).convert_alpha()
         self.cadaver = pygame.transform.scale(self.cadaver, (BIRD_SIZE, BIRD_SIZE))
         
         # Cargar imagen específica de Game Over

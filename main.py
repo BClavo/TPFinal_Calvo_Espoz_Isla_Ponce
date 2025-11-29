@@ -13,7 +13,7 @@ def main():
     pantalla = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Flappy Bird Genetico")
 
-    menu = MenuPrincipal(pantalla)
+    menu = MenuPrincipal(pantalla,"stranger")
     menu.ejecutar()
     # generacion_final, mejor_fitness = Juego.run()
     
