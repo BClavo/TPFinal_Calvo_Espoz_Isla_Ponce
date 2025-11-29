@@ -339,9 +339,13 @@ class Juego:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                    self.sound_manager.stop_music() # Detiene la música de la simulación
+                    self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         run = False
+                        self.sound_manager.stop_music() # Detiene la música de la simulación
+                        self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
                     elif event.key == pygame.K_r:
                         self.reiniciar()
                     elif event.key == pygame.K_SPACE:

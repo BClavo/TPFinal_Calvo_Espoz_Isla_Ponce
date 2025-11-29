@@ -154,6 +154,9 @@ class MenuPrincipal:
         self.mostrar_confirmacion = False
         self.mostrar_modo_juego = False
 
+        self.sound_manager = SoundManager() 
+        self.sound_manager.play_music('menu_music') # <-- Inicia la música del juego
+
     def ejecutar(self) -> None:
         """Bucle principal del menú."""
         while self.running:
@@ -167,16 +170,20 @@ class MenuPrincipal:
 
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.rect_tuerca.collidepoint(mouse_pos):
+                        self.sound_manager.play_sfx('click')
                         self.mostrar_configuracion()
                     elif self.mostrar_confirmacion:
                         self.gestionar_confirmacion(mouse_pos)
                     elif self.mostrar_modo_juego:
                         self.gestionar_modo(mouse_pos)
                     elif self.boton_play.click(mouse_pos):
+                        self.sound_manager.play_sfx('click')
                         self.mostrar_modo_juego = True
                     elif self.boton_personalizar.click(mouse_pos):
+                        self.sound_manager.play_sfx('click')
                         self.mostrar_personalizar()
                     elif self.boton_salir.click(mouse_pos):
+                        self.sound_manager.play_sfx('click')
                         self.mostrar_confirmacion = True
 
             self.boton_play.actualizar(mouse_pos)
@@ -218,8 +225,10 @@ class MenuPrincipal:
     def gestionar_confirmacion(self, mouse_pos: tuple[int, int]) -> None:
         """Gestiona la elección del cuadro de confirmación."""
         if self.boton_si.click(mouse_pos):
+            self.sound_manager.play_sfx('click')
             self.running = False
         elif self.boton_no.click(mouse_pos):
+            self.sound_manager.play_sfx('click')
             self.mostrar_confirmacion = False
 
     def dibujar_modo(self) -> None:
@@ -237,10 +246,12 @@ class MenuPrincipal:
     def gestionar_modo(self, mouse_pos: tuple[int, int]) -> None:
         """Gestiona el click en la selección de modo."""
         if self.boton_simulador.click(mouse_pos):
+            self.sound_manager.play_sfx('click')
             juego = Juego(self.pantalla)
             juego.run()
             self.mostrar_modo_juego = False
         elif self.boton_clasico.click(mouse_pos):
+            self.sound_manager.play_sfx('click')
             juego = Juego(self.pantalla, "clasico")
             juego.run()
             self.mostrar_modo_juego = False
