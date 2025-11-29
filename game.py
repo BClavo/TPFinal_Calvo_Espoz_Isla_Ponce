@@ -309,8 +309,7 @@ class Juego:
         elif self.modo=="clasico":
             titulo = self.font_small.render("Tuberias vs ronda jugada", True, TURQUESA)
 
-        self.screen.blit(titulo, (GRAPH_RECT.x, GRAPH_RECT.y - 25)) #Copia el contenido y lo coloca en la pantalla
-        self.screen.blit(titulo, (graph_rect_adjusted.x + 5, graph_rect_adjusted.y - 22))
+        self.screen.blit(titulo, (graph_rect_adjusted.x + 5, graph_rect_adjusted.y - 22)) # Copia el contenido y lo coloca en la pantalla
 
         data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history #Uso el promedio previo
         data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history
