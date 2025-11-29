@@ -17,6 +17,7 @@ class Juego:
         self.clock = pygame.time.Clock()
         self.fps= FPS
         self.modo = modo
+        self.game_over = False
 
         # Cargar imágenes
         self.cargar_imagenes()
@@ -40,14 +41,20 @@ class Juego:
         self.avg_fitness_history = []
         self.max_pipes_history= []
         self.distancia_acumulada = 0
+        
+        # Nuevas estadísticas
+        self.tiempo_generacion = 0
+        self.distancia_actual = 0
+        self.mejor_distancia = 0
+        self.promedio_distancia_history = []
 
         # Inicializar tuberías
         self.generar_tuberias_iniciales()
 
         # Fuentes 
-        self.font_title = pygame.font.Font(None, 36)
-        self.font_text = pygame.font.Font(None, 28)
-        self.font_small = pygame.font.Font(None, 22)
+        self.font_title = pygame.font.Font(None, 32)
+        self.font_text = pygame.font.Font(None, 24)
+        self.font_small = pygame.font.Font(None, 20)
         self.font_graph = pygame.font.Font(None,20)
 
         # Grafico de genoma 
@@ -55,7 +62,7 @@ class Juego:
 
         # Musicalizacion 
         self.sound_manager = SoundManager() 
-        self.sound_manager.play_music('game_music') # <-- Inicia la música del juego
+        self.sound_manager.play_music('game_music')
 
         self.espacio=False
 
@@ -76,7 +83,16 @@ class Juego:
 
         self.cadaver = pygame.image.load(SPRITE_PATHS['bird_dead']).convert_alpha()
         self.cadaver = pygame.transform.scale(self.cadaver, (BIRD_SIZE, BIRD_SIZE))
-        # no le apliques alpha global aquí, se aplica en Pajaro.muerte()
+        
+        # Cargar imagen específica de Game Over
+        self.game_over_image = pygame.image.load(SPRITE_PATHS['game_over']).convert_alpha()
+        # Escalar la imagen a un tamaño apropiado
+        original_width = self.game_over_image.get_width()
+        original_height = self.game_over_image.get_height()
+        scale_factor = min(600 / original_width, 250 / original_height)
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+        self.game_over_image = pygame.transform.scale(self.game_over_image, (new_width, new_height))
     
 
     def inicializar_poblacion(self):
@@ -146,7 +162,6 @@ class Juego:
             if self.modo=="simulador" :
                 if next_pipe and pajaro.decision_aleteo(next_pipe):
                     pajaro.aletear()
-                    # --- CONTROL DE SONIDO ---
                     self.sound_manager.play_sfx_limited('wing')
             elif self.modo=="clasico":
                 if self.espacio:
@@ -170,19 +185,34 @@ class Juego:
                                 self.sound_manager.play_sfx_limited('hit')
                             elif muerte_caida:
                                 self.sound_manager.play_sfx('die')
-                            sonido_muerte_reproducido = True # Se reproduce una vez y se desactiva
+                            sonido_muerte_reproducido = True
             
         self.pajaros_vivos = [p for p in self.pajaros_vivos if p.vivo]
         return True
 
     def crear_nueva_generacion(self):
         """Crea una nueva generación mediante algoritmo genético"""
+        # Verificar si llegamos a MAX_GENERATIONS
+        if self.generation >= MAX_GENERATIONS and self.modo == "simulador":
+            self.game_over = True
+            return
+        
         for b in self.pajaros:
             b.calcular_fitness()
 
         current_best = max(b.fitness for b in self.pajaros)
         current_avg = sum(b.fitness for b in self.pajaros) / len(self.pajaros)
         current_pipes= max(b.tuberias_pasadas for b in self.pajaros)
+        
+        # Actualizar estadísticas de distancia
+        current_distancia = max(b.distancia for b in self.pajaros)
+        promedio_distancia = sum(b.distancia for b in self.pajaros) / len(self.pajaros)
+        
+        self.distancia_actual = current_distancia
+        if current_distancia > self.mejor_distancia:
+            self.mejor_distancia = current_distancia
+        
+        self.promedio_distancia_history.append(promedio_distancia)
 
         if current_best > self.best_fitness_ever:
             self.best_fitness_ever = current_best
@@ -213,56 +243,91 @@ class Juego:
             self.grupo_pajaros.add(b)
 
         self.generation += 1
+        self.tiempo_generacion = 0  # Reiniciar tiempo de generación
         self.generar_tuberias_iniciales()
 
     def dibujar_estadisticas_texto(self):
-        """Dibuja el panel lateral de estadísticas"""
+        """Dibuja el panel lateral de estadísticas mejorado"""
         pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
-        y = 20
-        self.screen.blit(self.font_title.render("ESTADÍSTICAS", True, BLANCO), (GAME_WIDTH + 40, y))
-        y += 60
+        y = 15
+        
+        # Título
+        titulo = self.font_title.render("GA ESTADÍSTICAS", True, TURQUESA)
+        titulo_rect = titulo.get_rect(centerx=GAME_WIDTH + PANEL_WIDTH // 2)
+        titulo_rect.y = y
+        self.screen.blit(titulo, titulo_rect)
+        y += 45
+        
+        # Línea separadora
+        pygame.draw.line(self.screen,TURQUESA, 
+                        (GAME_WIDTH + 10, y), 
+                        (GAME_WIDTH + PANEL_WIDTH - 10, y), 2)
+        y += 15
+        
         vivos = len(self.pajaros_vivos)
-        tub_pas= max(b.tuberias_pasadas for b in self.pajaros_vivos) if vivos!=0 else 0
+        
+        # Calcular distancia actual (máxima de los pájaros vivos)
+        if vivos > 0:
+            distancia_actual = max(b.distancia for b in self.pajaros_vivos)
+        else:
+            distancia_actual = 0
+        
+        # Calcular velocidad
+        multiplicador = "X1" if self.clock.get_fps() < 90 else "X2"
+        
+        # Estadísticas en formato más compacto
         stats = [
-            (f"Generación: {self.generation}", VERDE),
-            (f"Vivos: {vivos}/{NUM_PAJAROS}", BLANCO),
-            (f"tuberías pasadas: {tub_pas}", BLANCO),
-            (f"Mejor Fitness: {int(self.best_fitness_ever)}", AMARILLO) if self.modo=="simulador" else (f"Max tuberias:{int(self.max_pipes_ever)}", AMARILLO)
+            (f"Generación: {self.generation}", BLANCO),
+            (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
+            (f"Tiempo Gen: {self.tiempo_generacion // 60}s", BLANCO),
+            (f"Velocidad: {multiplicador}", BLANCO),
+            "",  # Espaciador
+            (f"Distancia actual: {distancia_actual}", BLANCO),
+            (f"Mejor distancia: {self.mejor_distancia}", BLANCO),
+            (f"Distancia promedio: {int(self.promedio_distancia_history[-1]) if self.promedio_distancia_history else 0}", BLANCO),
         ]
-        for text, color in stats:
-            self.screen.blit(self.font_text.render(text, True, color), (GAME_WIDTH + 20, y))
-            y += 40
+        
+        for item in stats:
+            if item == "":
+                y += 10  # Espaciador
+                continue
+            text, color = item
+            rendered = self.font_text.render(text, True, color)
+            self.screen.blit(rendered, (GAME_WIDTH + 15, y))
+            y += 28  # Reducido de 32 a 28 para dar más espacio abajo
 
     def dibujar_grafico_fitness(self):
         """Dibuja el grafico de fitness promedio vs generacion"""
-        pygame.draw.rect(self.screen,GRAPH_BACKGROUND,GRAPH_RECT)
-        pygame.draw.rect(self.screen, GRAPH_BORDER,GRAPH_RECT,2,border_radius=5)
+        # Ajustar posición más abajo
+        graph_rect_adjusted = pygame.Rect(GRAPH_RECT.x, GRAPH_RECT.y + 50, GRAPH_RECT.width, GRAPH_RECT.height)
+        
+        pygame.draw.rect(self.screen, GRAPH_BACKGROUND, graph_rect_adjusted)
+        pygame.draw.rect(self.screen, GRAPH_BORDER, graph_rect_adjusted, 2, border_radius=5)
 
         if self.modo=="simulador":
-            titulo = self.font_small.render("Fitness promedio vs generacion", True, VERDE)
+            titulo = self.font_small.render("Fitness promedio vs generación", True, TURQUESA)
         elif self.modo=="clasico":
-            titulo = self.font_small.render("Tuberias vs ronda jugada", True, VERDE)
+            titulo = self.font_small.render("Tuberias vs ronda jugada", True, TURQUESA)
 
         self.screen.blit(titulo, (GRAPH_RECT.x, GRAPH_RECT.y - 25)) #Copia el contenido y lo coloca en la pantalla
+        self.screen.blit(titulo, (graph_rect_adjusted.x + 5, graph_rect_adjusted.y - 22))
 
         data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history #Uso el promedio previo
+        data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history
         if len(data) < 2:
-            return None #Si es menor a 2 generaciones no puede formar un grafico
+            return None
 
-        #Eje Y:                                      #}
-        max_fitness = max(data)                      #}
-                                                     #}Normaliza los datos para graficarlos
-        if max_fitness == 0: #}Evita dividir por 0   #}
-            max_fitness = 1  #}                      #}
-                                                     #}
-        #Eje X:
+        # Normalizar datos
+        max_fitness = max(data)
+        if max_fitness == 0:
+            max_fitness = 1
+                                                     
         number_generations = len(data) - 1
 
         dots = []
         for i, fitness in enumerate(data):
-            x = GRAPH_RECT.x + (i/ number_generations) * GRAPH_RECT.width #Se calcula la posicion del punto y se le suma al punto donde inicia el grafico
-            y = GRAPH_RECT.bottom - (fitness/max_fitness) * GRAPH_RECT.height #Le resta al final del grafico segun que tan alto el fitness, colocando el punto mas alto segun su fitness
-
+            x = graph_rect_adjusted.x + (i/ number_generations) * graph_rect_adjusted.width
+            y = graph_rect_adjusted.bottom - (fitness/max_fitness) * graph_rect_adjusted.height
             dots.append((int(x), int(y)))
 
         if len(dots) >= 2:
@@ -270,43 +335,106 @@ class Juego:
 
     def dibujar_grafico_genes(self):
         """Dibuja el grafico de promedio y varianza de genes por generación"""
-
         self.graph_gen.update_graph(self.generation,self.genes_promedio,self.desviacion)
         graph_surface = self.graph_gen.surface 
         
-        pygame.draw.rect(self.screen,(16,121,187),GRAPH_RECT_GEN)
-        titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
-        self.screen.blit(titulo, (GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y - 18)) #Copia el contenido y lo coloca en la pantalla
-
-        # Pegar el gráfico dentro del rectángulo
-        self.screen.blit(graph_surface, (GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y))
-
-
-    def dibujar_velocidad(self):
+        # Ajustar posición más abajo
+        graph_rect_gen_adjusted = pygame.Rect(GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y + 50, GRAPH_RECT_GEN.width, GRAPH_RECT_GEN.height)
         
-        multiplicador= "X1" if self.clock.get_fps() <90 else "X2"
-        pygame.draw.rect(self.screen, (100,100,100), (GRAPH_X, SPEED_Y, 40, 40))
-        texto=self.font_text.render(f"{multiplicador}",True, BLANCO)
-        self.screen.blit(texto, (GRAPH_X +10 , SPEED_Y + 10))
+        pygame.draw.rect(self.screen, (16,121,187), graph_rect_gen_adjusted)
+        titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
+        self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 18))
 
+        self.screen.blit(graph_surface, (graph_rect_gen_adjusted.x, graph_rect_gen_adjusted.y))
 
     def dibujar_panel_lateral(self):
         """Coloca el panel lateral, con el texto y grafico"""
-
         pygame.draw.rect(self.screen, NEGRO, (GAME_WIDTH, 0, PANEL_WIDTH, HEIGHT))
         
         self.dibujar_estadisticas_texto()
         self.dibujar_grafico_fitness()
         if self.modo=="simulador":
             self.dibujar_grafico_genes()
-            self.dibujar_velocidad()
-
+    
+    def dibujar_game_over(self):
+        """Dibuja la pantalla de Game Over con estadísticas finales"""
+        # Fondo negro
+        self.screen.fill(NEGRO)
+        
+        # Imagen de Game Over (título)
+        img_rect = self.game_over_image.get_rect(center=(WIDTH // 2, 150))
+        self.screen.blit(self.game_over_image, img_rect)
+        
+        # Cuadro de estadísticas finales
+        box_width = 400
+        box_height = 300
+        box_x = (WIDTH - box_width) // 2
+        box_y = 250
+        
+        # Fondo del cuadro
+        pygame.draw.rect(self.screen, (40, 40, 40), (box_x, box_y, box_width, box_height), border_radius=10)
+        pygame.draw.rect(self.screen, NARANJA, (box_x, box_y, box_width, box_height), 3, border_radius=10)
+        
+        # Título del cuadro
+        stats_title = self.font_title.render("ESTADÍSTICAS FINALES", True, TURQUESA)
+        stats_title_rect = stats_title.get_rect(centerx=WIDTH // 2)
+        stats_title_rect.y = box_y + 20
+        self.screen.blit(stats_title, stats_title_rect)
+        
+        # Línea separadora
+        pygame.draw.line(self.screen, TURQUESA, 
+                        (box_x + 20, box_y + 60), 
+                        (box_x + box_width - 20, box_y + 60), 2)
+        
+        # Estadísticas finales
+        y_offset = box_y + 80
+        promedio_final = int(self.promedio_distancia_history[-1]) if self.promedio_distancia_history else 0
+        
+        final_stats = [
+            ("Generaciones completadas:", f"{self.generation - 1}", BLANCO),
+            ("Mejor fitness alcanzado:", f"{int(self.best_fitness_ever)}", BLANCO),
+            ("Mejor distancia:", f"{self.mejor_distancia}", BLANCO),
+            ("Promedio de distancia final:", f"{promedio_final}", BLANCO),
+            ("Máximo de tuberías pasadas:", f"{self.max_pipes_ever}", BLANCO),
+        ]
+        
+        for label, value, color in final_stats:
+            # Label
+            label_text = self.font_text.render(label, True, BLANCO)
+            self.screen.blit(label_text, (box_x + 30, y_offset))
+            
+            # Value
+            value_text = self.font_text.render(value, True, color)
+            value_rect = value_text.get_rect(right=box_x + box_width - 30)
+            value_rect.y = y_offset
+            self.screen.blit(value_text, value_rect)
+            
+            y_offset += 45
+        
+        # Instrucciones
+        y_offset += 20
+        instructions = [
+            "Presiona R para reiniciar",
+            "Presiona ESC para volver al menú"
+        ]
+        
+        for instruction in instructions:
+            instr_text = self.font_small.render(instruction, True, (150, 150, 150))
+            instr_rect = instr_text.get_rect(centerx=WIDTH // 2)
+            instr_rect.y = y_offset
+            self.screen.blit(instr_text, instr_rect)
+            y_offset += 30
 
     def reiniciar(self):
         self.generation = 1
         self.best_fitness_ever = 0
         self.avg_fitness_history = []
         self.max_pipes_history=[]
+        self.tiempo_generacion = 0
+        self.distancia_actual = 0
+        self.mejor_distancia = 0
+        self.promedio_distancia_history = []
+        self.game_over = False
         self.inicializar_poblacion()
         self.generar_tuberias_iniciales()
 
@@ -315,13 +443,21 @@ class Juego:
             b.vivo = False
 
     def actualizar(self):
+        if self.game_over:
+            return  # No actualizar si el juego terminó
+        
         self.fondo.actualizar()
         self.actualizar_tuberias()
         self.grupo_tuberias.update()
+        self.tiempo_generacion += 1  # Incrementar tiempo de generación
         if not self.actualizar_pajaros():
             self.crear_nueva_generacion()
 
     def draw(self):
+        if self.game_over:
+            self.dibujar_game_over()
+            return
+        
         self.fondo.dibujar(self.screen)
     
         self.grupo_tuberias.draw(self.screen)
@@ -341,11 +477,13 @@ class Juego:
                     run = False
                     self.sound_manager.stop_music() # Detiene la música de la simulación
                     self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
+                    self.sound_manager.play_music('menu_music', loop=-1)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         run = False
                         self.sound_manager.stop_music() # Detiene la música de la simulación
                         self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
+                        self.sound_manager.play_music('menu_music', loop=-1)
                     elif event.key == pygame.K_r:
                         self.reiniciar()
                     elif event.key == pygame.K_SPACE:
@@ -363,4 +501,3 @@ class Juego:
             self.draw()
             pygame.display.flip()
         return self.generation, self.best_fitness_ever
-

@@ -214,10 +214,10 @@ class MenuPrincipal:
         """Dibuja el cuadro de confirmación de salida."""
         rect = pygame.Rect(WIDTH // 2 - 200, HEIGHT // 2 - 80, 400, 160)
         pygame.draw.rect(self.pantalla, (40, 40, 50), rect, border_radius=12)
-        texto = self.fuente_pregunta.render("¿Desea salir del juego?", True, BLANCO)
+        texto = self.fuente_pregunta.render("Desea salir del juego", True, BLANCO)
         self.pantalla.blit(texto, (rect.centerx - texto.get_width() // 2, rect.y + 30))
 
-        self.boton_si = Boton(rect.centerx - 90, rect.y + 90, "Sí", 80, 40, color_base=VERDE)
+        self.boton_si = Boton(rect.centerx - 90, rect.y + 90, "Si", 80, 40, color_base=VERDE)
         self.boton_no = Boton(rect.centerx + 10, rect.y + 90, "No", 80, 40, color_base=ROJO)
         self.boton_si.dibujar(self.pantalla)
         self.boton_no.dibujar(self.pantalla)
@@ -235,11 +235,11 @@ class MenuPrincipal:
         """Dibuja el submenú para elegir el modo de juego."""
         rect = pygame.Rect(WIDTH // 2 - 220, HEIGHT // 2 - 100, 440, 200)
         pygame.draw.rect(self.pantalla, (40, 40, 50), rect, border_radius=12)
-        texto = self.fuente_pregunta.render("Elegir modo de juego:", True, BLANCO)
+        texto = self.fuente_pregunta.render("Modo de juego", True, BLANCO)
         self.pantalla.blit(texto, (rect.centerx - texto.get_width() // 2, rect.y + 25))
 
         self.boton_simulador = Boton(rect.centerx - 100, rect.y + 80, "Simulador", 180, 45, AZUL)
-        self.boton_clasico = Boton(rect.centerx - 100, rect.y + 135, "Clásico", 180, 45, VERDE)
+        self.boton_clasico = Boton(rect.centerx - 100, rect.y + 135, "Clasico", 180, 45, VERDE)
         self.boton_simulador.dibujar(self.pantalla)
         self.boton_clasico.dibujar(self.pantalla)
 

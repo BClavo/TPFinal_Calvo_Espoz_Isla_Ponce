@@ -59,7 +59,6 @@ TURQUESA = (64,224,208)
 # --- RUTAS DE SPRITES ---
 SPRITE_PATHS = {
     'fondo': 'sprites/bg_dia.png',
-    'base': 'sprites/base.png',
     'bird': 'sprites/bird1.png',
     'bird_dead': 'sprites/bird2muerto.png',
     'pipe_top': 'sprites/toppipe.png',
@@ -68,7 +67,8 @@ SPRITE_PATHS = {
     'subtitulo': 'sprites/geneticover.png',
     'jugar': 'sprites/jugar.png',
     'personalizar': 'sprites/personalizar.png',
-    'salir': 'sprites/salir.png'
+    'salir': 'sprites/salir.png',
+    'game_over': 'sprites/game_over.png'
 }
 
 # --- RUTAS DEL MENU ---
