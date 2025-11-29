@@ -280,11 +280,11 @@ class Juego:
             (f"Generación: {self.generation}", BLANCO),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
             (f"Tiempo Gen: {self.tiempo_generacion // 60}s", BLANCO),
-            (f"Velocidad: {multiplicador}", BLANCO),
+            (f"Velocidad: {multiplicador}", AMARILLO),
             "",  # Espaciador
             (f"Distancia actual: {distancia_actual}", BLANCO),
-            (f"Mejor distancia: {self.mejor_distancia}", BLANCO),
             (f"Distancia promedio: {int(self.promedio_distancia_history[-1]) if self.promedio_distancia_history else 0}", BLANCO),
+            (f"Mejor distancia: {self.mejor_distancia}", AMARILLO),
         ]
         
         for item in stats:
@@ -474,14 +474,12 @@ class Juego:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-                    self.sound_manager.stop_music() # Detiene la música de la simulación
-                    self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
+                    self.sound_manager.stop_music()
                     self.sound_manager.play_music('menu_music', loop=-1)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         run = False
-                        self.sound_manager.stop_music() # Detiene la música de la simulación
-                        self.sound_manager.play_music('menu_music', loop=-1) # Vuelve a iniciar la música del menú
+                        self.sound_manager.stop_music()
                         self.sound_manager.play_music('menu_music', loop=-1)
                     elif event.key == pygame.K_r:
                         self.reiniciar()
