@@ -19,7 +19,7 @@ def rgb_to_mpl(rgb_tuple: tuple[int, int, int]) -> tuple[float, float, float]:
 
 class Pajaro(pygame.sprite.Sprite):
     """
-    Representa un pájaro con red neuronal simple, física y métricas para GA.
+    Representa un pájaro con genes(forma de arreglo), física y métricas para el algoritmo genetico.
 
     Args:
         genes (np.ndarray | None): Vector de 6 pesos del pájaro.
@@ -49,7 +49,7 @@ class Pajaro(pygame.sprite.Sprite):
 
     def decision_aleteo(self, tuberia) -> bool:
         """
-        Decide si el pájaro debe aletear usando su red neuronal simple.
+        Decide si el pájaro debe aletear usando sus genes y una formula.
 
         Args:
             tuberia (Tuberia): Tubería próxima que sirve como entrada.
