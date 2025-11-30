@@ -129,14 +129,15 @@ class MenuPrincipal:
         self.fuente_titulo = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['titulo'])
         self.fuente_pregunta = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['subtitulo'])
         self.running = True
-
+        
+        self.botones=True
         self.boton_play = BotonImagen(WIDTH // 4 - 110 , 440, SPRITE_PATHS['jugar'])
         self.boton_personalizar = BotonImagen(WIDTH // 2 - 110, 440, SPRITE_PATHS['personalizar'])
         self.boton_salir = BotonImagen(WIDTH*3 // 4 - 110, 440, SPRITE_PATHS['salir'])
 
         self.estilo= estilo
-        self.fondo = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
-        self.fondo = pygame.transform.scale(self.fondo, (WIDTH, HEIGHT))
+        self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+        self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
 
         # self.titulo_img = pygame.image.load(SPRITE_PATHS['titulo']).convert_alpha()
         # self.titulo_img = pygame.transform.scale(self.titulo_img, (600, 150))
@@ -153,6 +154,7 @@ class MenuPrincipal:
 
         self.mostrar_confirmacion = False
         self.mostrar_modo_juego = False
+        self.mostrar_personalizacion = False
 
         self.sound_manager = SoundManager() 
         self.sound_manager.play_music('menu_music') # <-- Inicia la música del juego
@@ -176,12 +178,14 @@ class MenuPrincipal:
                         self.gestionar_confirmacion(mouse_pos)
                     elif self.mostrar_modo_juego:
                         self.gestionar_modo(mouse_pos)
+                    elif self.mostrar_personalizacion:
+                        self.gestionar_personalizacion(mouse_pos)
                     elif self.boton_play.click(mouse_pos):
                         self.sound_manager.play_sfx('click')
                         self.mostrar_modo_juego = True
                     elif self.boton_personalizar.click(mouse_pos):
                         self.sound_manager.play_sfx('click')
-                        self.mostrar_personalizar()
+                        self.mostrar_personalizacion=True
                     elif self.boton_salir.click(mouse_pos):
                         self.sound_manager.play_sfx('click')
                         self.mostrar_confirmacion = True
@@ -196,19 +200,22 @@ class MenuPrincipal:
 
     def dibujar(self) -> None:
         """Dibuja todos los elementos del menú."""
-        self.pantalla.blit(self.fondo, (0, 0))
+        self.pantalla.blit(self.portada, (0, 0))
         #self.pantalla.blit(self.titulo_img, self.titulo_rect)
         #self.pantalla.blit(self.subtitulo_img, self.subtitulo_rect)
 
-        self.boton_play.dibujar(self.pantalla)
-        self.boton_personalizar.dibujar(self.pantalla)
-        self.boton_salir.dibujar(self.pantalla)
-        self.pantalla.blit(self.icono_tuerca, self.rect_tuerca)
+        if self.botones:
+            self.boton_play.dibujar(self.pantalla)
+            self.boton_personalizar.dibujar(self.pantalla)
+            self.boton_salir.dibujar(self.pantalla)
+            self.pantalla.blit(self.icono_tuerca, self.rect_tuerca)
 
         if self.mostrar_confirmacion:
             self.dibujar_confirmacion()
         elif self.mostrar_modo_juego:
             self.dibujar_modo()
+        elif self.mostrar_personalizacion:
+            self.mostrar_estilos()
 
     def dibujar_confirmacion(self) -> None:
         """Dibuja el cuadro de confirmación de salida."""
@@ -260,6 +267,66 @@ class MenuPrincipal:
         """Muestra el menú de configuración (placeholder)."""
         print('Configuración: sonido, música, controles, etc')
 
-    def mostrar_personalizar(self) -> None:
+    def mostrar_estilos(self) -> None:
         """Muestra el menú de personalización (placeholder)."""
-        print('Personalización: temas y elementos visuales, etc')
+        self.botones=False
+        self.lista_tematicas=["default","espacio","agua","bosque","mitologia","stranger","udesa"]
+        self.indice=self.lista_tematicas.index(self.estilo)
+        self.ind_medio=self.indice
+        self.ind_izq=self.ind_medio-1 if self.ind_medio-1 in range(len(self.lista_tematicas)) else -1
+        self.ind_der=self.ind_medio+1 if self.ind_medio+1 in range(len(self.lista_tematicas)) else 0
+
+        self.boton_medio= BotonImagen(WIDTH//2-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_medio]]['portada'],(200,100))
+        self.boton_izq= BotonImagen(WIDTH//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_izq]]['portada'],(200,100))
+        self.boton_der= BotonImagen(WIDTH*3//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_der]]['portada'],(200,100))
+        self.flecha_izq= BotonImagen(50,125,SPRITE_PATHS["flechai"], (50,50))
+        self.flecha_der= BotonImagen(WIDTH-100,125,SPRITE_PATHS["flechad"], (50,50))
+        self.boton_elegir= Boton(WIDTH//2-110,HEIGHT-80,"Elegir",color_base=VIOLETA)
+
+        self.boton_medio.dibujar(self.pantalla)
+        self.boton_izq.dibujar(self.pantalla)
+        self.boton_der.dibujar(self.pantalla)
+        self.flecha_izq.dibujar(self.pantalla)
+        self.flecha_der.dibujar(self.pantalla)
+        self.boton_elegir.dibujar(self.pantalla)
+
+        if self.estilo!="udesa":
+            pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//2)-53, (HEIGHT//2-3),106,106),3)
+            pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//4)-13, (HEIGHT//2-3),26,126),3)
+            pygame.draw.rect(self.pantalla,BLANCO,((WIDTH*3//4)-78, (HEIGHT//2-3),156,81),3)
+
+
+            self.pj= pygame.image.load(SPRITE_PATHS[self.estilo]['bird']).convert()
+            self.pj= pygame.transform.scale(self.pj, (100, 100))
+            self.pipe= pygame.image.load(SPRITE_PATHS[self.estilo]['pipe_bottom']).convert()
+            self.pipe= pygame.transform.scale(self.pipe, (20,120))
+            self.fondo= pygame.image.load(SPRITE_PATHS[self.estilo]['fondo']).convert()
+            self.fondo= pygame.transform.scale(self.fondo, (150, 75))
+
+            self.pantalla.blit(self.pj,((WIDTH//2)-50, (HEIGHT//2)))
+            self.pantalla.blit(self.pipe,((WIDTH//4)-10, (HEIGHT//2)))
+            self.pantalla.blit(self.fondo,((WIDTH*3//4)-75, (HEIGHT//2)))
+            
+            self.pantalla.blit(self.fuente_pregunta.render("personaje",True,ROJO),(WIDTH//2-60,HEIGHT//2+150))
+            self.pantalla.blit(self.fuente_pregunta.render("tuberia",True,ROJO),(WIDTH//4-45,HEIGHT//2+150))
+            self.pantalla.blit(self.fuente_pregunta.render("fondo",True,ROJO),(WIDTH*3//4-40,HEIGHT//2+150))
+
+
+        
+    def gestionar_personalizacion(self,mouse):
+        if self.flecha_izq.click(mouse):
+            self.sound_manager.play_sfx('click')
+            self.estilo=self.lista_tematicas[self.ind_izq]
+            self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+            self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
+        
+        elif self.flecha_der.click(mouse):
+            self.sound_manager.play_sfx('click')
+            self.estilo=self.lista_tematicas[self.ind_der]
+            self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+            self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))          
+        
+        elif self.boton_elegir.click(mouse):
+            self.sound_manager.play_sfx('click')
+            self.mostrar_personalizacion=False
+            self.botones=True

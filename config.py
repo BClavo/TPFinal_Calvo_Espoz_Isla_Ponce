@@ -55,6 +55,7 @@ AZUL = (100, 150, 255)
 AMARILLO = (255, 255, 0)
 NARANJA = (255, 165, 0)
 TURQUESA = (64,224,208)
+VIOLETA = (200,10,200)
 
 # --- RUTAS DE SPRITES ---
 SPRITE_PATHS = {
@@ -106,7 +107,9 @@ SPRITE_PATHS = {
     'jugar': 'sprites/jugar.png',
     'personalizar': 'sprites/personalizar.png',
     'salir': 'sprites/salir.png',
-    'game_over': 'sprites/game_over.png'
+    'game_over': 'sprites/game_over.png',
+    "flechai": 'sprites/flecha_izq.png' ,
+    "flechad": 'sprites/flecha_der.png',
 }
 
 # --- RUTAS DEL MENU ---
