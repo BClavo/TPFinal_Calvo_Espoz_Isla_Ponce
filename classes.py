@@ -92,7 +92,6 @@ class Pajaro(pygame.sprite.Sprite):
         self.vy += GRAVITY
         self.rect.y += self.vy
 
-        self.tiempo_vivo += 1
         self.distancia += 1
 
         if self.rect.top <= 0:
@@ -106,8 +105,7 @@ class Pajaro(pygame.sprite.Sprite):
         - Tuberías pasadas (más importante)
         - Bonus por supervivencia prolongada
         """
-        fitness_distancia = self.distancia * 2
-        # fitness_tiempo = self.tiempo_vivo * 1.5
+        fitness_distancia = self.distancia * 1.5
         fitness_tuberias = self.tuberias_pasadas * BONUS_POR_TUBERIA
 
         if self.tiempo_vivo > 300:
@@ -117,7 +115,6 @@ class Pajaro(pygame.sprite.Sprite):
 
         self.fitness = (
                 fitness_distancia +
-                # fitness_tiempo +
                 bonus_supervivencia +
                 fitness_tuberias
         )

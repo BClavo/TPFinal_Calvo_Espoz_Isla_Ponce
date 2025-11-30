@@ -20,6 +20,9 @@ class Juego:
         self.estilo=estilo
         self.game_over = False
 
+        # Contador de tiempo 
+        self.start_time = pygame.time.get_ticks()
+
         # Cargar imágenes
         self.cargar_imagenes()
 
@@ -44,7 +47,6 @@ class Juego:
         self.distancia_acumulada = 0
         
         # Nuevas estadísticas
-        self.tiempo_generacion = 0
         self.distancia_actual = 0
         self.mejor_distancia = 0
         self.promedio_distancia_history = []
@@ -181,6 +183,7 @@ class Juego:
                         sonido_tuberia_pasada = True 
 
             if pajaro_estaba_vivo and not pajaro.vivo:
+                    pajaro.tiempo_vivo = self.tiempo_transcurrido
                     if not sonido_muerte_reproducido:
                             if colision_tuberia:
                                 self.sound_manager.play_sfx_limited('hit')
@@ -193,6 +196,8 @@ class Juego:
 
     def crear_nueva_generacion(self):
         """Crea una nueva generación mediante algoritmo genético"""
+        self.start_time = pygame.time.get_ticks() # Reiniciar tiempo de generación
+
         # Verificar si llegamos a MAX_GENERATIONS
         if self.generation >= MAX_GENERATIONS and self.modo == "simulador":
             self.game_over = True
@@ -244,7 +249,6 @@ class Juego:
             self.grupo_pajaros.add(b)
 
         self.generation += 1
-        self.tiempo_generacion = 0  # Reiniciar tiempo de generación
         self.generar_tuberias_iniciales()
 
     def dibujar_estadisticas_texto(self):
@@ -280,7 +284,7 @@ class Juego:
         stats = [
             (f"Generación: {self.generation}", BLANCO),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
-            (f"Tiempo Gen: {self.tiempo_generacion // 60}s", BLANCO),
+            (f"Tiempo Gen: {round(self.tiempo_transcurrido,2)}s", BLANCO),
             (f"Velocidad: {multiplicador}", AMARILLO),
             "",  # Espaciador
             (f"Distancia actual: {distancia_actual}", BLANCO),
@@ -432,7 +436,7 @@ class Juego:
         self.best_fitness_ever = 0
         self.avg_fitness_history = []
         self.max_pipes_history=[]
-        self.tiempo_generacion = 0
+        self.start_time = pygame.time.get_ticks()
         self.distancia_actual = 0
         self.mejor_distancia = 0
         self.promedio_distancia_history = []
@@ -451,7 +455,6 @@ class Juego:
         self.fondo.actualizar()
         self.actualizar_tuberias()
         self.grupo_tuberias.update()
-        self.tiempo_generacion += 1  # Incrementar tiempo de generación
         if not self.actualizar_pajaros():
             self.crear_nueva_generacion()
 
@@ -474,6 +477,7 @@ class Juego:
         run = True
         while run and self.generation <= MAX_GENERATIONS:
             self.clock.tick(self.fps)
+            self.tiempo_transcurrido = (pygame.time.get_ticks() - self.start_time) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
