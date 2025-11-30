@@ -55,7 +55,7 @@ class Juego:
         self.generar_tuberias_iniciales()
 
         # Fuentes 
-        self.font_title = pygame.font.Font(None, 32)
+        self.font_title = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['subtitulo'])
         self.font_text = pygame.font.Font(None, 24)
         self.font_small = pygame.font.Font(None, 20)
         self.font_graph = pygame.font.Font(None,20)
@@ -257,7 +257,7 @@ class Juego:
         y = 15
         
         # Título
-        titulo = self.font_title.render("GA ESTADÍSTICAS", True, TURQUESA)
+        titulo = self.font_title.render("GA Estadisticas", True, TURQUESA)
         titulo_rect = titulo.get_rect(centerx=GAME_WIDTH + PANEL_WIDTH // 2)
         titulo_rect.y = y
         self.screen.blit(titulo, titulo_rect)
