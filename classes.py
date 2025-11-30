@@ -29,7 +29,7 @@ class Pajaro(pygame.sprite.Sprite):
 
     def __init__(self, genes=None, imagen_vivo=None, imagen_muerto=None):
         super().__init__()
-        self.genes = genes if genes is not None else np.random.uniform(-2, 2, 6)
+        self.genes = genes if genes is not None else np.random.uniform(-1.5, 1.5, 6)
 
         self.imagen_vivo = imagen_vivo
         self.imagen_muerto = imagen_muerto
@@ -107,7 +107,7 @@ class Pajaro(pygame.sprite.Sprite):
         - Bonus por supervivencia prolongada
         """
         fitness_distancia = self.distancia * 2
-        fitness_tiempo = self.tiempo_vivo * 1.5
+        # fitness_tiempo = self.tiempo_vivo * 1.5
         fitness_tuberias = self.tuberias_pasadas * BONUS_POR_TUBERIA
 
         if self.tiempo_vivo > 300:
@@ -117,7 +117,7 @@ class Pajaro(pygame.sprite.Sprite):
 
         self.fitness = (
                 fitness_distancia +
-                fitness_tiempo +
+                # fitness_tiempo +
                 bonus_supervivencia +
                 fitness_tuberias
         )

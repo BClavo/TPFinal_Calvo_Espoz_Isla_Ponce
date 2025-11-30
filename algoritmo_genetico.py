@@ -28,6 +28,23 @@ class Poblacion:
         indices = np.random.choice(len(self.poblacion), k, replace=False)
         mejor_idx = indices[np.argmax(self.fitnesses[indices])]
         return self.poblacion[mejor_idx]
+    
+    def seleccion_por_ruleta(self) -> 'Pajaro':
+        """Selecciona un pájaro con una probabilidad proporcional a su fitness.
+
+        Returns:
+            Pajaro: El individuo seleccionado.
+        """
+
+        # Calcular la suma total y las probabilidades.
+        probabilidades = self.fitnesses / np.sum(self.fitnesses)
+
+        # Elegir un índice (individuo) basado en las probabilidades calculadas.
+        # np.random.choice selecciona un elemento del array de población con 
+        # una probabilidad especificada por 'p'.
+        idx = np.random.choice(len(self.poblacion), p=probabilidades)
+
+        return self.poblacion[idx]
 
     def seleccion_elitista(self, n_elite: int = ELITE_SIZE):
         """Selecciona los mejores individuos y los pasa directamente a la siguiente generación.
@@ -85,7 +102,7 @@ class Poblacion:
         mascara = np.random.rand(*genes.shape) < rate
         ruido = np.random.normal(0, intensity, genes.shape)
         nuevos_genes = np.where(mascara, genes + ruido, genes)
-        return np.clip(nuevos_genes, -2, 2)
+        return np.clip(nuevos_genes, -1.5, 1.5)
 
     def crear_nueva_generacion(self, imagen_vivo=None, imagen_muerto=None):
         """Crea una nueva generación aplicando elitismo, selección, crossover y mutación.
@@ -108,8 +125,10 @@ class Poblacion:
         ]
 
         while len(nueva_poblacion) < NUM_PAJAROS:
-            padre1 = self.seleccion_por_torneo()
-            padre2 = self.seleccion_por_torneo()
+            # padre1 = self.seleccion_por_torneo()
+            # padre2 = self.seleccion_por_torneo()
+            padre1 = self.seleccion_por_ruleta()
+            padre2 = self.seleccion_por_ruleta()
 
             hijos = self.crossover_blend(padre1, padre2)
 
