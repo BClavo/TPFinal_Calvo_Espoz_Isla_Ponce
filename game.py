@@ -270,6 +270,7 @@ class Juego:
         y += 15
         
         vivos = len(self.pajaros_vivos)
+        tub_pas= max(b.tuberias_pasadas for b in self.pajaros_vivos) if vivos!=0 else 0
         
         # Calcular distancia actual (máxima de los pájaros vivos)
         if vivos > 0:
@@ -284,7 +285,9 @@ class Juego:
         stats = [
             (f"Generación: {self.generation}", BLANCO),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
+<<<<<<< Updated upstream
             (f"Tiempo Gen: {round(self.tiempo_transcurrido,2)}s", BLANCO),
+            (f"Tuberias pasadas: {tub_pas}", BLANCO),
             (f"Velocidad: {multiplicador}", AMARILLO),
             "",  # Espaciador
             (f"Distancia actual: {distancia_actual}", BLANCO),
@@ -301,7 +304,7 @@ class Juego:
             text, color = item
             rendered = self.font_text.render(text, True, color)
             self.screen.blit(rendered, (GAME_WIDTH + 15, y))
-            y += 24  # Reducido de 32 a 28 para dar más espacio abajo
+            y += 22  # Reducido de 32 a 28 para dar más espacio abajo
 
     def dibujar_grafico_fitness(self):
         """Dibuja el grafico de fitness promedio vs generacion"""
@@ -349,7 +352,7 @@ class Juego:
         
         pygame.draw.rect(self.screen, (16,121,187), graph_rect_gen_adjusted)
         titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
-        self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 18))
+        self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 20))
 
         self.screen.blit(graph_surface, (graph_rect_gen_adjusted.x, graph_rect_gen_adjusted.y))
 
