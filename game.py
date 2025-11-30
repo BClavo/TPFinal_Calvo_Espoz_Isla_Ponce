@@ -285,6 +285,7 @@ class Juego:
         stats = [
             (f"Generación: {self.generation}", BLANCO),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
+
             (f"Tiempo Gen: {round(self.tiempo_transcurrido,2)}s", BLANCO),
             (f"Tuberias pasadas: {tub_pas}", BLANCO),
             (f"Velocidad: {multiplicador}", AMARILLO),
@@ -308,7 +309,7 @@ class Juego:
     def dibujar_grafico_fitness(self):
         """Dibuja el grafico de fitness promedio vs generacion"""
         # Ajustar posición más abajo
-        graph_rect_adjusted = pygame.Rect(GRAPH_RECT.x, GRAPH_RECT.y + 50, GRAPH_RECT.width, GRAPH_RECT.height)
+        graph_rect_adjusted = pygame.Rect(GRAPH_RECT.x, GRAPH_RECT.y + 65, GRAPH_RECT.width, GRAPH_RECT.height)
         
         pygame.draw.rect(self.screen, GRAPH_BACKGROUND, graph_rect_adjusted)
         pygame.draw.rect(self.screen, GRAPH_BORDER, graph_rect_adjusted, 2, border_radius=5)
@@ -347,11 +348,11 @@ class Juego:
         graph_surface = self.graph_gen.surface 
         
         # Ajustar posición más abajo
-        graph_rect_gen_adjusted = pygame.Rect(GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y + 50, GRAPH_RECT_GEN.width, GRAPH_RECT_GEN.height)
+        graph_rect_gen_adjusted = pygame.Rect(GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y + 70, GRAPH_RECT_GEN.width, GRAPH_RECT_GEN.height)
         
         pygame.draw.rect(self.screen, (16,121,187), graph_rect_gen_adjusted)
         titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
-        self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 20))
+        self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 18))
 
         self.screen.blit(graph_surface, (graph_rect_gen_adjusted.x, graph_rect_gen_adjusted.y))
 
