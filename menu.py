@@ -136,17 +136,17 @@ class MenuPrincipal:
         self.boton_salir = BotonImagen(WIDTH*3 // 4 - 110, 440, SPRITE_PATHS['salir'])
 
         self.estilo= estilo
-        self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+        self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['fondo']).convert()
         self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
 
-        # self.titulo_img = pygame.image.load(SPRITE_PATHS['titulo']).convert_alpha()
-        # self.titulo_img = pygame.transform.scale(self.titulo_img, (600, 150))
-        # self.titulo_rect = self.titulo_img.get_rect(center=(WIDTH // 2, 140))
+        self.titulo_img = pygame.image.load(SPRITE_PATHS['titulo']).convert_alpha()
+        self.titulo_img = pygame.transform.scale(self.titulo_img, (600, 150))
+        self.titulo_rect = self.titulo_img.get_rect(center=(WIDTH // 2, 140))
 
-        # self.subtitulo_img = pygame.image.load(SPRITE_PATHS['subtitulo']).convert_alpha()
-        # self.subtitulo_img = pygame.transform.scale(self.subtitulo_img, (400, 100))
-        # self.subtitulo_rect = self.subtitulo_img.get_rect(
-        #     center=(self.titulo_rect.centerx + 80, self.titulo_rect.bottom + 10))
+        self.subtitulo_img = pygame.image.load(SPRITE_PATHS['subtitulo']).convert_alpha()
+        self.subtitulo_img = pygame.transform.scale(self.subtitulo_img, (400, 100))
+        self.subtitulo_rect = self.subtitulo_img.get_rect(
+            center=(self.titulo_rect.centerx + 80, self.titulo_rect.bottom + 10))
 
         self.icono_tuerca = pygame.image.load("sprites/gear.png").convert_alpha()
         self.icono_tuerca = pygame.transform.scale(self.icono_tuerca, (60, 60))
@@ -201,8 +201,8 @@ class MenuPrincipal:
     def dibujar(self) -> None:
         """Dibuja todos los elementos del menú."""
         self.pantalla.blit(self.portada, (0, 0))
-        #self.pantalla.blit(self.titulo_img, self.titulo_rect)
-        #self.pantalla.blit(self.subtitulo_img, self.subtitulo_rect)
+        self.pantalla.blit(self.titulo_img, self.titulo_rect)
+        self.pantalla.blit(self.subtitulo_img, self.subtitulo_rect)
 
         if self.botones:
             self.boton_play.dibujar(self.pantalla)
@@ -276,12 +276,18 @@ class MenuPrincipal:
         self.ind_izq=self.ind_medio-1 if self.ind_medio-1 in range(len(self.lista_tematicas)) else -1
         self.ind_der=self.ind_medio+1 if self.ind_medio+1 in range(len(self.lista_tematicas)) else 0
 
+        fondo_negro = pygame.Surface((WIDTH, HEIGHT))   # crea superficie del tamaño de la pantalla
+        fondo_negro.set_alpha(210)                      # ajusta transparencia (0=transparente, 255=opaco)
+        fondo_negro.fill((0, 0, 0))                     # color negro
+        self.pantalla.blit(fondo_negro, (0, 0))         # dibuja sobre la pantalla
+
+
         self.boton_medio= BotonImagen(WIDTH//2-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_medio]]['portada'],(200,100))
         self.boton_izq= BotonImagen(WIDTH//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_izq]]['portada'],(200,100))
         self.boton_der= BotonImagen(WIDTH*3//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_der]]['portada'],(200,100))
         self.flecha_izq= BotonImagen(50,125,SPRITE_PATHS["flechai"], (50,50))
         self.flecha_der= BotonImagen(WIDTH-100,125,SPRITE_PATHS["flechad"], (50,50))
-        self.boton_elegir= Boton(WIDTH//2-110,HEIGHT-80,"Elegir",color_base=VIOLETA)
+        self.boton_elegir= Boton(WIDTH//2-110,HEIGHT-80,"Elegir",color_base=NARANJA)
 
         self.boton_medio.dibujar(self.pantalla)
         self.boton_izq.dibujar(self.pantalla)
@@ -307,26 +313,40 @@ class MenuPrincipal:
             self.pantalla.blit(self.pipe,((WIDTH//4)-10, (HEIGHT//2)))
             self.pantalla.blit(self.fondo,((WIDTH*3//4)-75, (HEIGHT//2)))
             
-            self.pantalla.blit(self.fuente_pregunta.render("personaje",True,ROJO),(WIDTH//2-60,HEIGHT//2+150))
-            self.pantalla.blit(self.fuente_pregunta.render("tuberia",True,ROJO),(WIDTH//4-45,HEIGHT//2+150))
-            self.pantalla.blit(self.fuente_pregunta.render("fondo",True,ROJO),(WIDTH*3//4-40,HEIGHT//2+150))
+            self.pantalla.blit(self.fuente_pregunta.render("PERSONAJE",True,NARANJA),(WIDTH//2-60,HEIGHT//2+150))
+            self.pantalla.blit(self.fuente_pregunta.render("TUBERIA",True,NARANJA),(WIDTH//4-45,HEIGHT//2+150))
+            self.pantalla.blit(self.fuente_pregunta.render("FONDO",True,NARANJA),(WIDTH*3//4-40,HEIGHT//2+150))
+
+
+
 
 
         
-    def gestionar_personalizacion(self,mouse):
+    def gestionar_personalizacion(self, mouse):
         if self.flecha_izq.click(mouse):
             self.sound_manager.play_sfx('click')
-            self.estilo=self.lista_tematicas[self.ind_izq]
-            self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+            self.estilo = self.lista_tematicas[self.ind_izq]
+
+            # Si es udesa → usar portada, si no → usar fondo
+            if self.estilo == "udesa":
+                self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+            else:
+                self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['fondo']).convert()
+
             self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
-        
+
         elif self.flecha_der.click(mouse):
             self.sound_manager.play_sfx('click')
-            self.estilo=self.lista_tematicas[self.ind_der]
-            self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
-            self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))          
-        
+            self.estilo = self.lista_tematicas[self.ind_der]
+
+            if self.estilo == "udesa":
+                self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
+            else:
+                self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['fondo']).convert()
+
+            self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
+
         elif self.boton_elegir.click(mouse):
             self.sound_manager.play_sfx('click')
-            self.mostrar_personalizacion=False
-            self.botones=True
+            self.mostrar_personalizacion = False
+            self.botones = True

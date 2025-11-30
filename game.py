@@ -285,7 +285,6 @@ class Juego:
         stats = [
             (f"Generación: {self.generation}", BLANCO),
             (f"Vivos: {vivos}/{NUM_PAJAROS}", VERDE if vivos > 0 else ROJO),
-<<<<<<< Updated upstream
             (f"Tiempo Gen: {round(self.tiempo_transcurrido,2)}s", BLANCO),
             (f"Tuberias pasadas: {tub_pas}", BLANCO),
             (f"Velocidad: {multiplicador}", AMARILLO),
