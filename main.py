@@ -12,6 +12,8 @@ def main():
     # Crear ventana
     pantalla = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Flappy Bird Genetico")
+    icono = pygame.image.load(SPRITE_PATHS['icono']) 
+    pygame.display.set_icon(icono)
 
     menu = MenuPrincipal(pantalla)
     menu.ejecutar()

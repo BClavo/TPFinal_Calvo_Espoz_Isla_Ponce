@@ -110,6 +110,7 @@ SPRITE_PATHS = {
     'game_over': 'sprites/game_over.png',
     "flechai": 'sprites/flecha_izq.png' ,
     "flechad": 'sprites/flecha_der.png',
+    'icono': 'sprites/icono_flappy.png',
 }
 
 # --- RUTAS DEL MENU ---
