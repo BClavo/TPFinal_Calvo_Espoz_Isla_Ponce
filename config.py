@@ -1,52 +1,82 @@
-
 """
-Archivo de configuración central para el juego Flappy Bird Genético
+Archivo de configuración central para Flappy Bird Genético.
+
+Este módulo centraliza todas las constantes del juego incluyendo:
+- Dimensiones de pantalla y componentes
+- Parámetros físicos (gravedad, velocidades)
+- Configuración del algoritmo genético
+- Rutas de recursos (sprites, fuentes, audio)
+- Paleta de colores
+- Configuración de audio
+
+Modificar estos valores permite ajustar el comportamiento del juego
+sin necesidad de cambiar la lógica en otros módulos.
 """
 import os.path
-
 import pygame
 
 # --- CONFIGURACIÓN DE PANTALLA ---
-HEIGHT = 600
-WIDTH = 1000
-PANEL_WIDTH = 280
-GAME_WIDTH = 720
-FPS = 60
+
+HEIGHT = 600  # Altura total de la ventana (píxeles)
+WIDTH = 1000  # Ancho total de la ventana (píxeles)
+PANEL_WIDTH = 280  # Ancho del panel lateral de estadísticas
+GAME_WIDTH = 720  # Ancho del área de juego principal
+FPS = 60  # Frames por segundo base
+
 #--- CONFIGURACIÓN DEL GRAFICO ---
-GRAPH_X = GAME_WIDTH + 20
-GRAPH_Y = 255
-GRAPH_WIDTH = PANEL_WIDTH - 40
-GRAPH_HEIGHT = 120
-GRAPH_RECT = pygame.Rect(GRAPH_X,GRAPH_Y,GRAPH_WIDTH,GRAPH_HEIGHT) #Genera el cuadrado del grafico
-GRAPH_RECT_GEN = pygame.Rect(GRAPH_X,GRAPH_Y+GRAPH_HEIGHT+20,GRAPH_WIDTH,GRAPH_HEIGHT)
-SPEED_Y = GRAPH_Y+ 2*(GRAPH_HEIGHT+20)
-GRAPH_BACKGROUND =  (40,40,50)
-GRAPH_BORDER = (80,80,80)
+
+GRAPH_X = GAME_WIDTH + 20  # Posición X del gráfico
+GRAPH_Y = 255  # Posición Y del primer gráfico
+GRAPH_WIDTH = PANEL_WIDTH - 40  # Ancho del gráfico
+GRAPH_HEIGHT = 120  # Alto del gráfico
+
+# Rectángulos de los gráficos para renderizado
+GRAPH_RECT: pygame.Rect = pygame.Rect(GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT)
+GRAPH_RECT_GEN: pygame.Rect = pygame.Rect(
+    GRAPH_X, 
+    GRAPH_Y + GRAPH_HEIGHT + 20, 
+    GRAPH_WIDTH, 
+    GRAPH_HEIGHT
+)
+
+# Posición del indicador de velocidad
+SPEED_Y = GRAPH_Y + 2 * (GRAPH_HEIGHT + 20)
+
+# Colores de los gráficos
+GRAPH_BACKGROUND = (40, 40, 50)  # Fondo oscuro
+GRAPH_BORDER = (80, 80, 80)  # Borde gris
+
 # -- CONFIGURACIÓN DE FÍSICA ---
-GRAVITY = 0.5
-FLAP_STRENGTH = -10
+
+GRAVITY = 0.5  # Aceleración gravitacional (píxeles/frame²)
+FLAP_STRENGTH = -10  # Impulso vertical al aletear (píxeles/frame)
 
 # --- CONFIGURACIÓN DE TUBERÍAS ---
-PIPE_WIDTH = 70
-PIPE_GAP = 250
-MIN_PIPE_GAP = 150
-PIPE_SPEED = 6
-PIPE_HEIGHT = 500
-DISTANCIA_ENTRE_TUBERIAS = 360
-MARGEN_VERTICAL = 150
+
+PIPE_WIDTH = 70  # Ancho de cada tubería (píxeles)
+PIPE_GAP = 250  # Espacio vertical entre tuberías superior e inferior
+MIN_PIPE_GAP = 150  # Espacio mínimo permitido (no usado actualmente)
+PIPE_SPEED = 6  # Velocidad horizontal de desplazamiento
+PIPE_HEIGHT = 500  # Altura de la imagen de tubería
+DISTANCIA_ENTRE_TUBERIAS = 360  # Distancia horizontal entre pares
+MARGEN_VERTICAL = 150  # Margen superior/inferior para centros de hueco
+
 
 # --- CONFIGURACIÓN DEL PÁJARO ---
+
 BIRD_SIZE = 30
 
 # --- PARÁMETROS GENÉTICOS ---
-NUM_PAJAROS = 100
-MAX_GENERATIONS = 100
-ELITE_SIZE = 20
-MUTATION_RATE = 0.2
-MUTATION_INTENSITY = 0.4
-BONUS_POR_TUBERIA = 300
+
+NUM_PAJAROS = 100  # Tamaño de la población por generación
+MAX_GENERATIONS = 100  # Número máximo de generaciones en simulador
+ELITE_SIZE = 20  # Cantidad de individuos élite que pasan sin cambios
+MUTATION_RATE = 0.2  # Probabilidad de mutación por gen (20%)
+MUTATION_INTENSITY = 0.4  # Intensidad máxima de la mutación
+BONUS_POR_TUBERIA = 300  # Puntos de fitness por tubería pasada
 
 # --- COLORES ---
+
 NEGRO = (0, 0, 0)
 BLANCO = (255, 255, 255)
 VERDE = (0, 255, 0)
@@ -58,58 +88,87 @@ TURQUESA = (64,224,208)
 VIOLETA = (200,10,200)
 
 # --- RUTAS DE SPRITES ---
-SPRITE_PATHS = {
-    "default":{'fondo': 'sprites/temas/default/default_fondo.png',
-                'bird': 'sprites/temas/default/default_pj.png',
-                'bird_dead': 'sprites/temas/default/default_muerto.png',
-                'pipe_top': 'sprites/temas/default/default_toppipe.png',
-                'pipe_bottom': 'sprites/temas/default/default_bottompipe.png',
-                'portada': 'sprites/temas/default/default_portada.png'},
-    "espacio":{'fondo': 'sprites/temas/area51/espacio_fondo.png',
-                'bird': 'sprites/temas/area51/espacio_pj.png',
-                'bird_dead': 'sprites/temas/area51/espacio_muerto.png',
-                'pipe_top': 'sprites/temas/area51/espacio_toppipe.png',
-                'pipe_bottom': 'sprites/temas/area51/espacio_bottompipe.png',
-                'portada': 'sprites/temas/area51/espacio_portada.png'},
-    "agua":{'fondo': 'sprites/temas/bajo_agua/agua_fondo.png',
-                'bird': 'sprites/temas/bajo_agua/agua_pj.png',
-                'bird_dead': 'sprites/temas/bajo_agua/agua_muerto.png',
-                'pipe_top': 'sprites/temas/bajo_agua/agua_toppipe.png',
-                'pipe_bottom': 'sprites/temas/bajo_agua/agua_bottompipe.png',
-                'portada': 'sprites/temas/bajo_agua/agua_portada.png'},
-    "bosque":{'fondo': 'sprites/temas/bosque/bosque_fondo.png',
-                'bird': 'sprites/temas/bosque/bosque_pj.png',
-                'bird_dead': 'sprites/temas/bosque/bosque_muerto.png',
-                'pipe_top': 'sprites/temas/bosque/bosque_toppipe.png',
-                'pipe_bottom': 'sprites/temas/bosque/bosque_bottompipe.png',
-                'portada': 'sprites/temas/bosque/bosque_portada.png'},
-    "mitologia":{'fondo': 'sprites/temas/mitologia/mitologia_fondo.png',
-                'bird': 'sprites/temas/mitologia/mitologia_pj.png',
-                'bird_dead': 'sprites/temas/mitologia/mitologia_muerto.png',
-                'pipe_top': 'sprites/temas/mitologia/mitologia_toppipe.png',
-                'pipe_bottom': 'sprites/temas/mitologia/mitologia_bottompipe.png',
-                'portada': 'sprites/temas/mitologia/mitologia_portada.png'},
-    "stranger":{'fondo': 'sprites/temas/stranger/stranger_fondo.png',
-                'bird': 'sprites/temas/stranger/stranger_pj.png',
-                'bird_dead': 'sprites/temas/stranger/stranger_muerto.png',
-                'pipe_top': 'sprites/temas/stranger/stranger_toppipe.png',
-                'pipe_bottom': 'sprites/temas/stranger/stranger_bottompipe.png',
-                'portada': 'sprites/temas/stranger/stranger_portada.png'},
-    "udesa":{'fondo': 'sprites/temas/udesa/udesa_fondo.png',
-                'bird': 'sprites/temas/udesa/udesa_pj.png',
-                'bird_dead': 'sprites/temas/udesa/udesa_muerto.png',
-                'pipe_top': 'sprites/temas/udesa/udesa_toppipe.png',
-                'pipe_bottom': 'sprites/temas/udesa/udesa_bottompipe.png',
-                'portada': 'sprites/temas/udesa/udesa_portada.png'},
 
+SPRITE_PATHS = {
+    # Tema por defecto
+    "default": {
+        'fondo': 'sprites/temas/default/default_fondo.png',
+        'bird': 'sprites/temas/default/default_pj.png',
+        'bird_dead': 'sprites/temas/default/default_muerto.png',
+        'pipe_top': 'sprites/temas/default/default_toppipe.png',
+        'pipe_bottom': 'sprites/temas/default/default_bottompipe.png',
+        'portada': 'sprites/temas/default/default_portada.png'
+    },
+    
+    # Tema espacial
+    "espacio": {
+        'fondo': 'sprites/temas/area51/espacio_fondo.png',
+        'bird': 'sprites/temas/area51/espacio_pj.png',
+        'bird_dead': 'sprites/temas/area51/espacio_muerto.png',
+        'pipe_top': 'sprites/temas/area51/espacio_toppipe.png',
+        'pipe_bottom': 'sprites/temas/area51/espacio_bottompipe.png',
+        'portada': 'sprites/temas/area51/espacio_portada.png'
+    },
+    
+    # Tema submarino
+    "agua": {
+        'fondo': 'sprites/temas/bajo_agua/agua_fondo.png',
+        'bird': 'sprites/temas/bajo_agua/agua_pj.png',
+        'bird_dead': 'sprites/temas/bajo_agua/agua_muerto.png',
+        'pipe_top': 'sprites/temas/bajo_agua/agua_toppipe.png',
+        'pipe_bottom': 'sprites/temas/bajo_agua/agua_bottompipe.png',
+        'portada': 'sprites/temas/bajo_agua/agua_portada.png'
+    },
+    
+    # Tema bosque
+    "bosque": {
+        'fondo': 'sprites/temas/bosque/bosque_fondo.png',
+        'bird': 'sprites/temas/bosque/bosque_pj.png',
+        'bird_dead': 'sprites/temas/bosque/bosque_muerto.png',
+        'pipe_top': 'sprites/temas/bosque/bosque_toppipe.png',
+        'pipe_bottom': 'sprites/temas/bosque/bosque_bottompipe.png',
+        'portada': 'sprites/temas/bosque/bosque_portada.png'
+    },
+    
+    # Tema mitología
+    "mitologia": {
+        'fondo': 'sprites/temas/mitologia/mitologia_fondo.png',
+        'bird': 'sprites/temas/mitologia/mitologia_pj.png',
+        'bird_dead': 'sprites/temas/mitologia/mitologia_muerto.png',
+        'pipe_top': 'sprites/temas/mitologia/mitologia_toppipe.png',
+        'pipe_bottom': 'sprites/temas/mitologia/mitologia_bottompipe.png',
+        'portada': 'sprites/temas/mitologia/mitologia_portada.png'
+    },
+    
+    # Tema Stranger Things
+    "stranger": {
+        'fondo': 'sprites/temas/stranger/stranger_fondo.png',
+        'bird': 'sprites/temas/stranger/stranger_pj.png',
+        'bird_dead': 'sprites/temas/stranger/stranger_muerto.png',
+        'pipe_top': 'sprites/temas/stranger/stranger_toppipe.png',
+        'pipe_bottom': 'sprites/temas/stranger/stranger_bottompipe.png',
+        'portada': 'sprites/temas/stranger/stranger_portada.png'
+    },
+    
+    # Tema UdeSA
+    "udesa": {
+        'fondo': 'sprites/temas/udesa/udesa_fondo.png',
+        'bird': 'sprites/temas/udesa/udesa_pj.png',
+        'bird_dead': 'sprites/temas/udesa/udesa_muerto.png',
+        'pipe_top': 'sprites/temas/udesa/udesa_toppipe.png',
+        'pipe_bottom': 'sprites/temas/udesa/udesa_bottompipe.png',
+        'portada': 'sprites/temas/udesa/udesa_portada.png'
+    },
+    
+    # Sprites comunes del menú
     'titulo': 'sprites/titulo3.png',
     'subtitulo': 'sprites/geneticover.png',
     'jugar': 'sprites/jugar.png',
     'personalizar': 'sprites/personalizar.png',
     'salir': 'sprites/salir.png',
     'game_over': 'sprites/game_over.png',
-    "flechai": 'sprites/flecha_izq.png' ,
-    "flechad": 'sprites/flecha_der.png',
+    'flechai': 'sprites/flecha_izq.png',
+    'flechad': 'sprites/flecha_der.png',
     'icono': 'sprites/icono_flappy.png',
 }
 
