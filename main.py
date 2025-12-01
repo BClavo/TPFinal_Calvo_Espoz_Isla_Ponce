@@ -6,28 +6,32 @@ from menu import MenuPrincipal
 
 def main():
     """Función principal que inicia el juego"""
-    # Inicializar Pygame
+
+    # Inicializar todos los módulos de Pygame (display, sound, joystick, etc.)
     pygame.init()
     
-    # Crear ventana
-    pantalla = pygame.display.set_mode((WIDTH, HEIGHT))
+    # Crear ventana del juego con dimensiones configuradas
+    pantalla: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
+    
+    # Establecer título de la ventana
     pygame.display.set_caption("Flappy Bird Genetico")
-    icono = pygame.image.load(SPRITE_PATHS['icono']) 
+    
+    # Cargar y establecer ícono de la ventana
+    icono: pygame.Surface = pygame.image.load(SPRITE_PATHS['icono'])
     pygame.display.set_icon(icono)
 
-    menu = MenuPrincipal(pantalla)
+    # Crear instancia del menú principal
+    menu: MenuPrincipal = MenuPrincipal(pantalla)
+    
+    # Ejecutar el bucle del menú
     menu.ejecutar()
-    # generacion_final, mejor_fitness = Juego.run()
-    
-    # Cerrar Pygame
+ 
+    # Cerrar Pygame y liberar recursos
     pygame.quit()
-    
-    # Mostrar resultados finales
-    # print(f"Generaciones completadas: {generación_final - 1}")
-    # print(f"Mejor fitness alcanzado: {int(mejor_fitness)}")
+
+  
 
 
 if __name__ == "__main__":
     main()
-
 
