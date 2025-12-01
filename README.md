@@ -464,29 +464,13 @@ Pygame NO tiene gráficos estadísticos → Matplotlib resuelve eso.
 
 ---
 
-### 🎬 **Video 1 — Instalación y ejecución del juego**
-
-video:
-
-```
-[VIDEO: instalación y ejecución]
-```
-
-Debe mostrar:
-
-* Descarga del repositorio
-* Instalación de dependencias
-* `python main.py`
-* Pantalla del menú principal
-
----
-
-### 🎬 **Video 2 — Cómo funciona el modo Simulador**
+### 🎬 **Video 1 — Cómo funciona el modo Simulador**
 
 Colocar aquí:
 
 ```
-[VIDEO: modo simulador ]
+[VIDEO: modo simulador ](assets/v_simulador.mp4)
+
 ```
 
 Mostrar:
@@ -498,12 +482,12 @@ Mostrar:
 
 ---
 
-### 🎬 **Video 3 — Cómo jugar en Modo Clásico**
+### 🎬 **Video 2 — Cómo jugar en Modo Clásico**
 
 Colocar aquí:
 
 ```
-[VIDEO: modo clásico]
+[VIDEO: modo clásico](assets/v_clasico.mp4)
 ```
 
 Mostrar:
@@ -514,12 +498,12 @@ Mostrar:
 
 ---
 
-### 🎬 **Video 4 — Personalización de Temas**
+### 🎬 **Video 3 — Personalización de Temas**
 
 Colocar aquí:
 
 ```
-[VIDEO: personalización ]
+[VIDEO: personalización ](assets/v_personalizar.mp4)
 ```
 
 Demostrar:
