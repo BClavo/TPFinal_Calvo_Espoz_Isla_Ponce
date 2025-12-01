@@ -446,6 +446,8 @@ class Juego:
         self.mejor_distancia = 0
         self.promedio_distancia_history = []
         self.game_over = False
+        self.sound_manager.stop_music()
+        self.sound_manager.play_music('game_music')
         self.inicializar_poblacion()
         self.generar_tuberias_iniciales()
 
