@@ -252,81 +252,64 @@ Funciones relevantes de:
 
 ---
 
-# 🎮 10.1 PYGAME – TODAS LAS FUNCIONES IMPORTANTES EXPLICADAS
+## 🎮 10.1 PYGAME – TODAS LAS FUNCIONES IMPORTANTES EXPLICADAS
 
 Pygame es el **motor central del proyecto**. Renderiza sprites, procesa eventos, maneja el audio, controla el framerate y permite dibujar gráficos. 
 
 ---
 
-## 🔷 A. Inicialización y ventana
+### 🔷 A. Inicialización y ventana
 
-### `pygame.init()`
+#### `pygame.init()` - Inicializa todos los módulos de Pygame: display, audio, teclado, tiempo.
 
-Inicializa todos los módulos de Pygame: display, audio, teclado, tiempo.
+#### `pygame.display.set_mode((w,h))` - Crea la ventana del juego.
 
-### `pygame.display.set_mode((w,h))`
+#### `pygame.display.set_caption("texto")` - Define el nombre de la ventana.
 
-Crea la ventana del juego.
-
-### `pygame.display.set_caption("texto")`
-
-Define el nombre de la ventana.
-
-### `pygame.display.set_icon(surface)`
-
-Cambia el ícono de la ventana.
+#### `pygame.display.set_icon(surface)` - Cambia el ícono de la ventana.
 
 ---
 
-## 🔷 B. Eventos / Input
+### 🔷 B. Eventos / Input
 
-### `pygame.event.get()`
+#### `pygame.event.get()` - Devuelve una lista con todos los eventos (teclado, mouse, cerrar ventana).
 
-Devuelve una lista con todos los eventos (teclado, mouse, cerrar ventana).
+#### `pygame.KEYDOWN`, `pygame.MOUSEBUTTONDOWN`, `pygame.QUIT` - Constantes que representan tipos de evento.
 
-### `pygame.KEYDOWN`, `pygame.MOUSEBUTTONDOWN`, `pygame.QUIT`
+#### `event.key == pygame.K_SPACE` - Revisa teclas específicas.
 
-Constantes que representan tipos de evento.
-
-### `event.key == pygame.K_SPACE`
-
-Revisa teclas específicas.
-
-### `pygame.mouse.get_pos()`
-
-Devuelve la posición actual del mouse.
+#### `pygame.mouse.get_pos()` - Devuelve la posición actual del mouse.
 
 ---
 
-## 🔷 C. Imágenes
+### 🔷 C. Imágenes
 
-### `pygame.image.load(path)`
+#### `pygame.image.load(path)` - Carga una imagen en un `Surface`.
 
-Carga una imagen en un `Surface`.
+#### `Surface.convert_alpha()` - Convierte la imagen para permitir transparencia.
 
-### `Surface.convert_alpha()`
-
-Convierte la imagen para permitir transparencia.
-
-### `pygame.transform.scale(surface, (w,h))`
-
-Escala imágenes (muy usado en tu juego para fondos, pájaros y tuberías).
+#### `pygame.transform.scale(surface, (w,h))` - Escala imágenes (muy usado en tu juego para fondos, pájaros y tuberías).
 
 ---
 
-## 🔷 D. Sprites
+### 🔷 D. Sprites
 
-Tu proyecto usa **pygame.sprite.Sprite** para pájaros y tuberías:
+🧩 ¿Qué es **pygame.sprite.Sprite**?
+Es una clase base que facilita la creación y manejo de objetos gráficos (sprites) en un juego. Un sprite es básicamente cualquier objeto visual que aparece en pantalla: personajes, obstáculos, proyectiles, etc.
 
-### `class Pajaro(pygame.sprite.Sprite)`
+El proyecto usa **pygame.sprite.Sprite** para pájaros y tuberías para:
+   * Colisiones automáticas
+      - Pygame ofrece funciones como `pygame.sprite.spritecollide()` o `pygame.sprite.groupcollide()` que detectan choques entre sprites.
+      - Esto simplifica mucho la lógica de verificar si el pájaro toca una tubería.
+   * Grupos de sprites
+      - Se puede agrupar pájaros y tuberías en pygame.sprite.Group().
+      - Con un solo método (`group.update()` o `group.draw(surface)`) actualizas o dibujas todos los objetos, en lugar de hacerlo uno por uno.
 
-Sprites con colisiones y física.
+#### `class Pajaro(pygame.sprite.Sprite)` - Sprites con colisiones y física.
 
-### `class Tuberia(pygame.sprite.Sprite)`
+#### `class Tuberia(pygame.sprite.Sprite)` - Sprites móviles que se desplazan hacia la izquierda.
 
-Sprites móviles que se desplazan hacia la izquierda.
-
-### `pygame.sprite.Group()`
+#### `pygame.sprite.Group()`
 
 Agrupa sprites para:
 
@@ -334,25 +317,18 @@ Agrupa sprites para:
 - Actualizarlos
 - Detectar colisiones
 
-### `pygame.sprite.spritecollideany(obj, grupo)`
-
-Devuelve True si `obj` colisiona con algún elemento del grupo.
+#### `pygame.sprite.spritecollideany(obj, grupo)` - Devuelve True si `obj` colisiona con algún elemento del grupo.
 
 ---
 
-## 🔷 E. Tiempo / FPS
+### 🔷 E. Tiempo / FPS
 
-### `pygame.time.Clock()`
+#### `pygame.time.Clock()` - Controla el framerate del juego.
 
-Controla el framerate del juego.
+#### `clock.tick(FPS)` - Limita la actualización a FPS cuadros por segundo.
 
-### `clock.tick(FPS)`
+#### `pygame.time.get_ticks()` - Devuelve el tiempo en milisegundos desde que inició el juego.
 
-Limita la actualización a FPS cuadros por segundo.
-
-### `pygame.time.get_ticks()`
-
-Devuelve el tiempo en milisegundos desde que inició el juego.
 Usado para:
 
 * Identificar tuberías (`id_tuberia`)
@@ -361,164 +337,106 @@ Usado para:
 
 ---
 
-## 🔷 F. Audio
+### 🔷 F. Audio
 
-Tu SoundManager utiliza **estas funciones**:
+El SoundManager utiliza **estas funciones**:
 
-### `pygame.mixer.init()`
+#### `pygame.mixer.init()` - Inicializa el motor de audio.
 
-Inicializa el motor de audio.
+#### `pygame.mixer.Sound(path)` - Carga efectos de sonido.
 
-### `pygame.mixer.Sound(path)`
+#### `sound.play()` - Reproduce un efecto de sonido.
 
-Carga efectos de sonido.
+#### `sound.set_volume(vol)` - Cambia su volumen.
 
-### `sound.play()`
+#### `pygame.mixer.music.load(path)` - Carga música de fondo.
 
-Reproduce un efecto de sonido.
-
-### `sound.set_volume(vol)`
-
-Cambia su volumen.
-
-### `pygame.mixer.music.load(path)`
-
-Carga música de fondo.
-
-### `pygame.mixer.music.play(loop)`
-
-Reproduce música (en loop infinito).
+#### `pygame.mixer.music.play(loop)` - Reproduce música (en loop infinito).
 
 ---
 
-## 🔷 G. Dibujar en pantalla
+### 🔷 G. Dibujar en pantalla
 
-### `surface.blit(imagen, (x,y))`
+#### `surface.blit(imagen, (x,y))` - Dibuja imágenes.
 
-Dibuja imágenes.
+#### `pygame.draw.rect(surface,color,rect,border_radius)` - Dibuja paneles, botones, gráficos, etc.
 
-### `pygame.draw.rect(surface,color,rect,border_radius)`
+#### `pygame.draw.line(surface,color,(x1,y1),(x2,y2))` - Dibuja líneas (usado para separación en panel lateral).
 
-Dibuja paneles, botones, gráficos, etc.
-
-### `pygame.draw.line(surface,color,(x1,y1),(x2,y2))`
-
-Dibuja líneas (usado para separación en panel lateral).
-
-### `pygame.draw.lines(surface,color,closed,points,width)`
-
-Dibuja la línea del gráfico de fitness.
+#### `pygame.draw.lines(surface,color,closed,points,width)` - Dibuja la línea del gráfico de fitness.
 
 ---
 
-## 🔷 H. Colisiones, rectángulos y posición
+### 🔷 H. Colisiones, rectángulos y posición
 
-### `surface.get_rect()`
+#### `surface.get_rect()` - Crea un rectángulo alrededor del sprite.
 
-Crea un rectángulo alrededor del sprite.
+#### `rect.x`, `rect.y` - Coordenadas del objeto.
 
-### `rect.x`, `rect.y`
-
-Coordenadas del objeto.
-
-### `rect.top`, `rect.bottom`, `rect.center`
-
-Propiedades útiles en física.
+#### `rect.top`, `rect.bottom`, `rect.center` - Propiedades útiles en física.
 
 ---
 
-# 🔢 10.2 NUMPY – TODAS LAS FUNCIONES USADAS Y SU ROL
+## 🔢 10.2 NUMPY – TODAS LAS FUNCIONES USADAS Y SU ROL
 
 NumPy es el corazón del **algoritmo genético**. Permite operar vectores/genes de forma rápida.
 
 ---
 
-## 📌 Funciones usadas
+### 📌 Funciones usadas
 
-### `np.random.uniform(a, b, size)`
+#### `np.random.uniform(a, b, size)` - Genera genes iniciales aleatorios en rango [-1.5, 1.5].
 
-Genera genes iniciales aleatorios en rango [-1.5, 1.5].
+#### `np.array([...])` - Transforma listas en vectores.
 
-### `np.array([...])`
-
-Transforma listas en vectores.
-
-### `np.mean(vectores, axis=0)`
+#### `np.mean(vectores, axis=0)`
 
 Calcula la media de cada gen en la población.
 Se usa para mostrar el **genoma promedio**.
 
-### `np.std(vectores, axis=0)`
+#### `np.std(vectores, axis=0)` - Calcula desviación estándar → Varianza genética.
 
-Calcula desviación estándar → Varianza genética.
+#### `np.argsort(array)` - Ordena individuos por fitness (para elitismo).
 
-### `np.argsort(array)`
+#### `np.random.choice(n, p=prob)` - Selección por ruleta.
 
-Ordena individuos por fitness (para elitismo).
+#### `np.random.normal(0, intensity, shape)` - Mutación gaussiana.
 
-### `np.random.choice(n, p=prob)`
-
-Selección por ruleta.
-
-### `np.random.normal(0, intensity, shape)`
-
-Mutación gaussiana.
-
-### `np.clip(array, min, max)`
-
-Garantiza que los genes no salgan del rango [-1.5,1.5].
+#### `np.clip(array, min, max)` - Garantiza que los genes no salgan del rango [-1.5,1.5].
 
 ---
 
-# 📊 10.3 MATPLOTLIB – TODAS LAS FUNCIONES Y EXPLICACIÓN PROFUNDA
+## 📊 10.3 MATPLOTLIB – TODAS LAS FUNCIONES Y EXPLICACIÓN PROFUNDA
 
 Matplotlib se usa dentro de Pygame gracias a:
 
-### `matplotlib.use("Agg")`
-
-Permite renderizar gráficos **sin abrir ventanas externas**.
+#### `matplotlib.use("Agg")` - Permite renderizar gráficos **sin abrir ventanas externas**.
 
 ---
 
-## Funciones fundamentales
+### Funciones fundamentales
 
-### `plt.subplots(figsize=(w,h), dpi=100)`
+#### `plt.subplots(figsize=(w,h), dpi=100)` - Crea figura + eje.
 
-Crea figura + eje.
+#### `ax.barh()` - Crea barras horizontales para visualizar los genes.
 
-### `ax.barh()`
+#### `ax.set_facecolor(color)` - Define fondo del gráfico.
 
-Crea barras horizontales para visualizar los genes.
+#### `ax.grid(axis="x")` - Dibuja líneas grises verticales para facilitar lectura.
 
-### `ax.set_facecolor(color)`
+#### `ax.set_yticks()`, `ax.set_yticklabels()` - Labels personalizados: w0, w1, w2…
 
-Define fondo del gráfico.
+#### `ax.text(x,y,text)` - Imprime el valor numérico sobre cada barra.
 
-### `ax.grid(axis="x")`
+#### `fig.canvas.draw()` - Renderiza el gráfico en memoria.
 
-Dibuja líneas grises verticales para facilitar lectura.
-
-### `ax.set_yticks()`, `ax.set_yticklabels()`
-
-Labels personalizados: w0, w1, w2…
-
-### `ax.text(x,y,text)`
-
-Imprime el valor numérico sobre cada barra.
-
-### `fig.canvas.draw()`
-
-Renderiza el gráfico en memoria.
-
-### `fig.canvas.buffer_rgba()`
-
-Extrae la imagen como bytes → se convierte a `pygame.Surface`.
+#### `fig.canvas.buffer_rgba()` - Extrae la imagen como bytes → se convierte a `pygame.Surface`.
 
 ---
 
-# 🧠 11. ¿POR QUÉ USAMOS NUMPY + MATPLOTLIB?
+## 🧠 11. ¿POR QUÉ USAMOS NUMPY + MATPLOTLIB?
 
-## 🔢 **NumPy**
+### 🔢 **NumPy**
 
 Porque permite evolucionar una población de 100 individuos en milisegundos:
 
@@ -530,7 +448,7 @@ Un AG sin NumPy sería **100x más lento**.
 
 ---
 
-## 📊 **Matplotlib**
+### 📊 **Matplotlib**
 
 Porque permite:
 
@@ -542,11 +460,11 @@ Pygame NO tiene gráficos estadísticos → Matplotlib resuelve eso.
 
 ---
 
-# 🎥 12. CÓMO UTILIZAR EL JUEGO (CON DEMOSTRACIONES EN VIDEO)
+## 🎥 12. CÓMO UTILIZAR EL JUEGO (DEMOSTRACIONES EN VIDEO)
 
 ---
 
-## 🎬 **Video 1 — Instalación y ejecución del juego**
+### 🎬 **Video 1 — Instalación y ejecución del juego**
 
 video:
 
@@ -563,7 +481,7 @@ Debe mostrar:
 
 ---
 
-## 🎬 **Video 2 — Cómo funciona el modo Simulador**
+### 🎬 **Video 2 — Cómo funciona el modo Simulador**
 
 Colocar aquí:
 
@@ -580,7 +498,7 @@ Mostrar:
 
 ---
 
-## 🎬 **Video 3 — Cómo jugar en Modo Clásico**
+### 🎬 **Video 3 — Cómo jugar en Modo Clásico**
 
 Colocar aquí:
 
@@ -596,7 +514,7 @@ Mostrar:
 
 ---
 
-## 🎬 **Video 4 — Personalización de Temas**
+### 🎬 **Video 4 — Personalización de Temas**
 
 Colocar aquí:
 
