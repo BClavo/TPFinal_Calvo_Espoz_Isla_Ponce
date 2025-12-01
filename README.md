@@ -193,12 +193,12 @@ Donde:
 | Tema | Descripción |
 |------|-------------|
 | **Default** | Tema clásico de Flappy Bird |
-| **Espacio** | Temática espacial futurista |
-| **Agua** | Ambiente submarino |
-| **Bosque** | Entorno natural con árboles |
+| **AREA 51** | Temática espacial futurista con alien |
+| **Bajo agua** | Ambiente submarino |
+| **Bosque encantado** | Entorno con árboles y hadas! |
 | **Mitología** | Inspirado en mitología griega |
-| **Stranger** | Estética de Stranger Things |
-| **UdeSA** | Tema personalizado universitario |
+| **Stranger things** | Estética de Stranger Things por la nueva temporada! |
+| **UdeSA** | Tema personalizado |
 
 ### Personalización
 
