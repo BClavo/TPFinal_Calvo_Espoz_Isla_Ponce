@@ -201,6 +201,8 @@ class Juego:
         # Verificar si llegamos a MAX_GENERATIONS
         if self.generation >= MAX_GENERATIONS and self.modo == "simulador":
             self.game_over = True
+            self.sound_manager.stop_music()
+            self.sound_manager.play_music('game_over')
             return
         
         for b in self.pajaros:

@@ -391,7 +391,8 @@ class SoundManager:
 
         self.music_paths = {
             'game_music': AUDIO_PATHS.get('game_music'),
-            'menu_music': AUDIO_PATHS.get('menu_music')
+            'menu_music': AUDIO_PATHS.get('menu_music'),
+            'game_over': AUDIO_PATHS.get('game_over')
         }
         pygame.mixer.music.set_volume(MUSIC_VOLUME)
 
