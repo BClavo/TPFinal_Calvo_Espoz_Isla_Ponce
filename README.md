@@ -466,52 +466,20 @@ Pygame NO tiene gráficos estadísticos → Matplotlib resuelve eso.
 
 ### 🎬 **Video 1 — Cómo funciona el modo Simulador**
 
-Colocar aquí:
 
-```
-[VIDEO: modo simulador ](assets/v_simulador.mp4)
-
-```
-
-Mostrar:
-
-* 100 pájaros volando
-* Evolución de generaciones
-* Gráfico de fitness subiendo
-* Gráfico de genes estabilizando
+[VIDEO: modo simulador](assets/v_simulador.mp4)
 
 ---
 
 ### 🎬 **Video 2 — Cómo jugar en Modo Clásico**
 
-Colocar aquí:
-
-```
 [VIDEO: modo clásico](assets/v_clasico.mp4)
-```
-
-Mostrar:
-
-* Aleteo con espacio
-* Colisiones
-* Estadísticas de rondas
 
 ---
 
 ### 🎬 **Video 3 — Personalización de Temas**
 
-Colocar aquí:
-
-```
 [VIDEO: personalización ](assets/v_personalizar.mp4)
-```
-
-Demostrar:
-
-* Cambio entre temas
-* Vista previa de pájaro / tubería / fondo
-* Aplicación del tema al juego
-
 
 ---
 
@@ -571,8 +539,8 @@ Con el tiempo, los pesos genéticos convergen hacia valores óptimos:
 - Calvo, Bautista
 - Espoz, Rocío
 - Isla, Ivan
-- Ponce Albarracin, Adrian Santiago 
-**-**
+- Ponce Albarracin, Adrian Santiago
+---
 - Materia: Pensamiento Computacional
 - Universidad: Universidad de San Andrés
 - Año: 2025
