@@ -1,10 +1,31 @@
+"""
+Módulo Principal de Lógica del Juego Flappy Bird Genético.
+
+Aquí se gestiona el ciclo completo del juego, tanto en modo simulador 
+(controlado mediante algoritmo genético) como en modo clásico 
+(controlado por el jugador). Este módulo coordina la física, generación 
+de tuberías, actualización de entidades, interfaz visual y transiciones 
+entre generaciones.
+
+Incluye:
+
+- Clase Juego: controlador global del gameplay
+- Generación y actualización de tuberías, pájaros y fondo
+- Inicialización y control del algoritmo genético mediante Poblacion
+- Panel lateral con estadísticas en tiempo real
+- Gráficos de fitness y de evolución del genoma
+- Lógica de Game Over, reinicio y velocidad dinámica
+- Soporte para sonidos y música del juego
+
+El ciclo del juego sigue los pasos:
+    1. Actualizar estado (pájaros, tuberías, fondo)
+    2. Detectar colisiones y calcular métricas
+    3. Crear nueva generación (modo simulador)
+    4. Dibujar escena completa y panel lateral
+    5. Manejar entrada del jugador o algoritmo
+"""
 import pygame
 import random
-import os 
-import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt 
 from classes import Pajaro, Tuberia, crear_par_tuberias, Fondo, Graph_manager, SoundManager
 from algoritmo_genetico import Poblacion
 from config import *
@@ -12,7 +33,7 @@ from config import *
 class Juego:
     """Clase principal que maneja toda la lógica del juego Flappy Bird Genético."""
 
-    def __init__(self, screen,modo="simulador", estilo="default"):
+    def __init__(self, screen:pygame.Surface,modo:str="simulador", estilo:str="default"):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.fps= FPS
@@ -67,6 +88,7 @@ class Juego:
         self.sound_manager = SoundManager() 
         self.sound_manager.play_music('game_music')
 
+        #tecla de espacio para modo clasico
         self.espacio=False
 
         
@@ -105,10 +127,11 @@ class Juego:
             Pajaro(imagen_vivo=self.imagen_pajarito, imagen_muerto=self.cadaver)
             for _ in range(NUM_PAJAROS)
         ]
-        else:
+        else: #si el modo es modo clasico, genera un solo pajaro
             self.pajaros = [
             Pajaro(imagen_vivo=self.imagen_pajarito, imagen_muerto=self.cadaver)
             ]
+        #vacia la lista de pajaros de la generacion termianda
         self.grupo_pajaros.empty()
         for b in self.pajaros:
             self.grupo_pajaros.add(b)
@@ -138,18 +161,20 @@ class Juego:
             self.generar_nueva_tuberia()
             self.distancia_acumulada = 0
 
-    def obtener_tuberia_cercana(self):
+    def obtener_tuberia_cercana(self)->Tuberia|None:
         """Obtiene la tubería más cercana adelante de los pájaros vivos"""
         if not self.pajaros_vivos:
             return None
-
+        #toma la posicion en x de los pajaros
         promedio_x = sum(b.rect.right for b in self.pajaros_vivos) / len(self.pajaros_vivos)
+        #toma las tuberias que estén a la derechas de los pajaros
         pipes_front = [p for p in self.grupo_tuberias if p.rect.x + p.ancho > promedio_x]
+        #ordena las tuberias de mas cercana a mas lejana
         pipes_front.sort(key=lambda p: p.rect.x - promedio_x)
-
+        #retorna la primer tuberia de la lista, la mas cercana
         return pipes_front[0] if pipes_front else None
 
-    def actualizar_pajaros(self):
+    def actualizar_pajaros(self)-> bool:
         """Actualiza la lógica de todos los pájaros vivos"""
         if not self.pajaros_vivos:
             return False
@@ -162,6 +187,7 @@ class Juego:
         for pajaro in self.pajaros_vivos:  
         # --- Capturar el estado antes de la actualización ---
             pajaro_estaba_vivo = pajaro.vivo
+            #decide bajo que condiciones aletear en cada modo
             if self.modo=="simulador" :
                 if next_pipe and pajaro.decision_aleteo(next_pipe):
                     pajaro.aletear()
@@ -203,7 +229,7 @@ class Juego:
             self.game_over = True
             self.sound_manager.stop_music()
             self.sound_manager.play_music('game_over')
-            return
+            return #corta la creacion de nuevas generaciones
         
         for b in self.pajaros:
             b.calcular_fitness()
@@ -231,6 +257,7 @@ class Juego:
         self.avg_fitness_history.append(current_avg)
         self.max_pipes_history.append(current_pipes)
 
+        #genera siguiente ronda
         if self.modo=="simulador":
             self.poblacion = Poblacion(self.pajaros)
             self.pajaros = self.poblacion.crear_nueva_generacion(
@@ -315,7 +342,7 @@ class Juego:
         
         pygame.draw.rect(self.screen, GRAPH_BACKGROUND, graph_rect_adjusted)
         pygame.draw.rect(self.screen, GRAPH_BORDER, graph_rect_adjusted, 2, border_radius=5)
-
+        #cambia el nombre segun el modo
         if self.modo=="simulador":
             titulo = self.font_small.render("Fitness promedio vs generación", True, TURQUESA)
         elif self.modo=="clasico":
@@ -324,7 +351,8 @@ class Juego:
         self.screen.blit(titulo, (graph_rect_adjusted.x + 5, graph_rect_adjusted.y - 22)) # Copia el contenido y lo coloca en la pantalla
 
         data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history #Uso el promedio previo
-        data = self.avg_fitness_history if self.modo=="simulador" else self.max_pipes_history
+
+        #dibuja el grafico solo si tiene suficientes puntos para hacer una linea
         if len(data) < 2:
             return None
 
@@ -335,6 +363,7 @@ class Juego:
                                                      
         number_generations = len(data) - 1
 
+        #generacion del grafico acorde a la cntidad de generaciones hasta el momento
         dots = []
         for i, fitness in enumerate(data):
             x = graph_rect_adjusted.x + (i/ number_generations) * graph_rect_adjusted.width
@@ -349,9 +378,10 @@ class Juego:
         self.graph_gen.update_graph(self.generation,self.genes_promedio,self.desviacion)
         graph_surface = self.graph_gen.surface 
         
-        # Ajustar posición más abajo
+        # reajusta el grafico al tamaño definido en la configuracion
         graph_rect_gen_adjusted = pygame.Rect(GRAPH_RECT_GEN.x, GRAPH_RECT_GEN.y + 70, GRAPH_RECT_GEN.width, GRAPH_RECT_GEN.height)
         
+        #dibuja el grafico
         pygame.draw.rect(self.screen, (16,121,187), graph_rect_gen_adjusted)
         titulo = self.font_small.render("Genome (Avg ± Std)", True, TURQUESA)
         self.screen.blit(titulo, (graph_rect_gen_adjusted.x + 5, graph_rect_gen_adjusted.y - 18))
@@ -387,7 +417,7 @@ class Juego:
         pygame.draw.rect(self.screen, NARANJA, (box_x, box_y, box_width, box_height), 3, border_radius=10)
         
         # Título del cuadro
-        stats_title = self.font_title.render("ESTADÍSTICAS FINALES", True, TURQUESA)
+        stats_title = self.font_title.render("ESTADISTICAS FINALES", True, TURQUESA)
         stats_title_rect = stats_title.get_rect(centerx=WIDTH // 2)
         stats_title_rect.y = box_y + 20
         self.screen.blit(stats_title, stats_title_rect)
@@ -402,7 +432,7 @@ class Juego:
         promedio_final = int(self.promedio_distancia_history[-1]) if self.promedio_distancia_history else 0
         
         final_stats = [
-            ("Generaciones completadas:", f"{self.generation - 1}", BLANCO),
+            ("Generaciones completadas:", f"{self.generation}", BLANCO),
             ("Mejor fitness alcanzado:", f"{int(self.best_fitness_ever)}", BLANCO),
             ("Mejor distancia:", f"{self.mejor_distancia}", BLANCO),
             ("Promedio de distancia final:", f"{promedio_final}", BLANCO),
@@ -437,6 +467,7 @@ class Juego:
             y_offset += 30
 
     def reiniciar(self):
+        "devuelve todos los atributos a su estado inicial para comenzar de nuevo la simulacion"
         self.generation = 1
         self.best_fitness_ever = 0
         self.avg_fitness_history = []
@@ -452,10 +483,12 @@ class Juego:
         self.generar_tuberias_iniciales()
 
     def forzar_siguiente_generacion(self):
+        "mata a todos los pajaros de la simulacion para ejecutar la siguiente generacion"
         for b in self.pajaros:
             b.vivo = False
 
     def actualizar(self):
+        "actualiza el estado de todos los elementos de la simulacion si el juego no terminó aún"
         if self.game_over:
             return  # No actualizar si el juego terminó
         
@@ -466,9 +499,10 @@ class Juego:
             self.crear_nueva_generacion()
 
     def draw(self):
+        "presenta en pantalla las imagenes, graficos, pajaros o mensajes necesarios para la simulacion"
         if self.game_over:
             self.dibujar_game_over()
-            return
+            return #retorna unicamente el mensaje si el juego terminó
         
         self.fondo.dibujar(self.screen)
     
@@ -481,34 +515,43 @@ class Juego:
         self.dibujar_panel_lateral()
 
     def run(self):
+        "corre el juego y maneja la interaccion con el usuario"
         run = True
         while run and self.generation <= MAX_GENERATIONS:
             self.clock.tick(self.fps)
             self.tiempo_transcurrido = (pygame.time.get_ticks() - self.start_time) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    #corta el juego al tocar el bton de cerrar
                     run = False
                     self.sound_manager.stop_music()
                     self.sound_manager.play_music('menu_music', loop=-1)
                 if event.type == pygame.KEYDOWN:
+                    #regresa al menú con el escape
                     if event.key == pygame.K_ESCAPE:
                         run = False
                         self.sound_manager.stop_music()
                         self.sound_manager.play_music('menu_music', loop=-1)
+                    #reinicia la partida con la r
                     elif event.key == pygame.K_r:
                         self.reiniciar()
+                    #usa el espacio para forzar la siguiente generación o saltar segun el modo
                     elif event.key == pygame.K_SPACE:
                         if self.modo=="simulador":
                             self.forzar_siguiente_generacion()
                         elif self.modo=="clasico":
                             self.espacio=True
+                    #usa la tecla control para alterar la velocidad entre x1 y x2
                     elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                         if self.modo=="simulador":
                             if self.clock.get_fps()<90:
                                 self.fps*=2
                             elif self.clock.get_fps()>90:
                                 self.fps=FPS
+            #corta la generacion si supera los dos minutos
+            if self.modo=="simulador" and self.tiempo_transcurrido>=120:
+                self.forzar_siguiente_generacion()
             self.actualizar()
             self.draw()
             pygame.display.flip()
-        return self.generation, self.best_fitness_ever
+        #return self.generation, self.best_fitness_ever

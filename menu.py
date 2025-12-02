@@ -1,3 +1,26 @@
+"""
+Módulo de Menú Principal para Flappy Bird Genético.
+
+Este módulo administra toda la interacción inicial del usuario con el juego,
+incluyendo navegación entre pantallas, selección de modo de juego, 
+personalización visual y confirmaciones de salida. Proporciona botones
+interactivos y detección de clicks
+
+Incluye:
+
+- Botones estándar y botones basados en imágenes
+- Menú principal con portada y música
+- Submenú de selección de modo (Simulador / Clásico)
+- Sistema de confirmación de salida
+- Menú de personalización de estilo visual
+
+El menú sigue un flujo básico:
+    1. Mostrar portada y botones principales
+    2. Detectar interacciones del jugador
+    3. Cargar modos de juego o submenús
+    4. Inicializar la clase Juego cuando corresponde
+"""
+
 import pygame
 from config import *
 from game import Juego
@@ -33,7 +56,7 @@ class Boton:
         self.color_actual = color_base
         self.fuente = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['subtitulo'])
 
-    def dibujar(self, pantalla) -> None:
+    def dibujar(self, pantalla: pygame.Surface) -> None:
         """Dibuja el botón en pantalla.
 
         Args:
@@ -123,7 +146,7 @@ class MenuPrincipal:
         pantalla (pygame.Surface): Pantalla donde se renderiza.
     """
 
-    def __init__(self, pantalla, estilo="default"):
+    def __init__(self, pantalla:pygame.Surface, estilo: str="default"):
         self.pantalla = pantalla
         self.clock = pygame.time.Clock()
         self.fuente_titulo = pygame.font.Font(FONT_PATHS['flappyfont'], FONT_SIZES['titulo'])
@@ -268,7 +291,7 @@ class MenuPrincipal:
         print('Configuración: sonido, música, controles, etc')
 
     def mostrar_estilos(self) -> None:
-        """Muestra el menú de personalización (placeholder)."""
+        """Muestra el menú de personalización"""
         self.botones=False
         self.lista_tematicas=["default","espacio","agua","bosque","mitologia","stranger","udesa"]
         self.indice=self.lista_tematicas.index(self.estilo)
@@ -317,12 +340,9 @@ class MenuPrincipal:
             self.pantalla.blit(self.fuente_pregunta.render("TUBERIA",True,NARANJA),(WIDTH//4-45,HEIGHT//2+150))
             self.pantalla.blit(self.fuente_pregunta.render("FONDO",True,NARANJA),(WIDTH*3//4-40,HEIGHT//2+150))
 
-
-
-
-
-        
-    def gestionar_personalizacion(self, mouse):
+  
+    def gestionar_personalizacion(self, mouse:tuple[int,int]):
+        """Gestiona el click en la selección de personalizacion."""
         if self.flecha_izq.click(mouse):
             self.sound_manager.play_sfx('click')
             self.estilo = self.lista_tematicas[self.ind_izq]

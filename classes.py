@@ -1,3 +1,26 @@
+"""
+Módulo de Clases Principales del Juego.
+
+Este módulo contiene las clases fundamentales utilizadas para construir
+la lógica visual, física y auditiva del juego Flappy Bird Genético, sin incluir
+el menú y la ejecución del juego en sí mismo. Reúne tanto los elementos del gameplay 
+como las utilidades de representación gráfica y sonido.
+
+Incluye:
+
+- Clase Pajaro: física del personaje, decisiones genéticas, colisiones y fitness
+- Clase Tuberia: obstáculos superiores e inferiores con movimiento lateral
+- Generador crear_par_tuberias: creación sincronizada de tuberías
+- Clase Fondo: efecto de desplazamiento infinito
+- Clase Graph_manager: renderizado del gráfico del genoma (promedio y desviación)
+- Clase SoundManager: efectos de sonido, música y cooldowns de reproducción
+
+Estas clases proveen:
+    1. Entidades esenciales para el funcionamiento del juego
+    2. Soporte para el algoritmo genético (genes, fitness, métricas)
+    3. Mecánicas visuales y auditivas coherentes
+    4. Infraestructura de renderizado (sprites, gráficos, fondo)
+"""
 import pygame
 import numpy as np
 from config import *
@@ -141,7 +164,7 @@ class Pajaro(pygame.sprite.Sprite):
             return True
         return False
 
-    def verificar_colision_tuberia(self, grupo_tuberias) -> bool:
+    def verificar_colision_tuberia(self, grupo_tuberias:pygame.sprite.Group) -> bool:
         """
         Verifica colisión del pájaro con tuberías.
 
@@ -183,7 +206,7 @@ class Tuberia(pygame.sprite.Sprite):
         id_tuberia (int): Identificador único por par.
     """
 
-    def __init__(self, x_inicial: int, y_inicial: int, superior: bool, imagen_top, imagen_bottom, id_tuberia: int):
+    def __init__(self, x_inicial: int, y_inicial: int, superior: bool, imagen_top: pygame.Surface, imagen_bottom: pygame.Surface, id_tuberia: int):
         super().__init__()
         self.superior = superior
         self.velocidad = PIPE_SPEED
@@ -205,8 +228,8 @@ class Tuberia(pygame.sprite.Sprite):
 def crear_par_tuberias(
         x_inicial: int,
         centro_gap: int,
-        imagen_top,
-        imagen_bottom
+        imagen_top: pygame.Surface,
+        imagen_bottom: pygame.Surface
 ) -> tuple['Tuberia', 'Tuberia']:
     """
     Crea un par de tuberías (superior e inferior).
@@ -236,7 +259,7 @@ class Fondo:
         imagen (pygame.Surface): Imagen del fondo.
     """
 
-    def __init__(self, imagen):
+    def __init__(self, imagen: pygame.Surface):
         self.imagen = imagen
         self.x1 = 0
         self.x2 = GAME_WIDTH
@@ -251,7 +274,7 @@ class Fondo:
         if self.x2 <= -GAME_WIDTH:
             self.x2 = self.x1 + GAME_WIDTH
 
-    def dibujar(self, pantalla) -> None:
+    def dibujar(self, pantalla: pygame.Surface) -> None:
         """
         Dibuja el fondo desplazado.
 
@@ -272,9 +295,9 @@ class Graph_manager:
         title (str): Título del gráfico.
     """
 
-    def __init__(self, size=(GRAPH_WIDTH, GRAPH_HEIGHT),
-                 labels=["w0", "w1(Δy)", "w2(Δy²)", "w3(Δx)", "w4(Δx²)", "w5(vy)"],
-                 title="Genome (Avg ± Std)"):
+    def __init__(self, size: tuple[int, int] =(GRAPH_WIDTH, GRAPH_HEIGHT),
+                 labels: list[str] =["w0", "w1(Δy)", "w2(Δy²)", "w3(Δx)", "w4(Δx²)", "w5(vy)"],
+                 title: str ="Genome (Avg ± Std)"):
         self.size = size
         self.labels = labels
         self.title = title
@@ -454,10 +477,3 @@ class SoundManager:
         """Detiene la música."""
         pygame.mixer.music.stop()
 
-    def pause_music(self) -> None:
-        """Pausa la música."""
-        pygame.mixer.music.pause()
-
-    def unpause_music(self) -> None:
-        """Reanuda la música pausada."""
-        pygame.mixer.music.unpause()
