@@ -344,11 +344,12 @@ class MenuPrincipal:
         self.flecha_der.dibujar(self.pantalla)
         self.boton_elegir.dibujar(self.pantalla)
 
+        pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//2)-122, 88, 244,124),2)
         #se muestra el personaje, tuberías y fondo si el estilo no es el de udesa
         if self.estilo!="udesa":
             #se genrra un borde blanco para resaltar el elemento respecto del fondo
-            pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//2)-53, (HEIGHT//2-3),106,106),3)
             pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//4)-13, (HEIGHT//2-3),26,126),3)
+            pygame.draw.rect(self.pantalla,BLANCO,((WIDTH*3//4)-78, (HEIGHT//2-3),156,81),3)
             pygame.draw.rect(self.pantalla,BLANCO,((WIDTH*3//4)-78, (HEIGHT//2-3),156,81),3)
 
             #se adecuan los tamaños de las imagenes correspondientes al diccionario de estilos y se los muestra
