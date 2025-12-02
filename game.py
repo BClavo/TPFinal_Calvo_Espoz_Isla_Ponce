@@ -549,7 +549,7 @@ class Juego:
                             elif self.clock.get_fps()>90:
                                 self.fps=FPS
             #corta la generacion si supera los dos minutos
-            if self.modo=="simulador" and self.tiempo_transcurrido>=120:
+            if self.modo=="simulador" and self.tiempo_transcurrido>=MAX_TIME:
                 self.forzar_siguiente_generacion()
             self.actualizar()
             self.draw()

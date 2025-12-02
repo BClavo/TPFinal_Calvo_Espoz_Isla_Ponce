@@ -40,10 +40,10 @@ El proyecto incluye dos modos de juego:
 
 ## 🎯 2.Características principales
 
-- **Algoritmo genético completo**: Selección por torneo/ruleta, crossover blend, mutación adaptativa y elitismo
+- **Algoritmo genético completo**: Selección por torneo/ruleta, crossover blend/en un punto, mutación adaptativa y elitismo
 - **Visualización en tiempo real**: Gráficos de fitness, genoma promedio y estadísticas detalladas
 - **7 temas visuales personalizables**: Default, Espacio, Agua, Bosque, Mitología, Stranger Things y UdeSA
-- **Sistema de audio completo**: Música de fondo y efectos de sonido (aleteo, colisión, puntos)
+- **Sistema de audio completo**: Música de fondo y efectos de sonido (aleteo, colisión, puntos, clickeo)
 - **Control de velocidad**: Acelera la simulación 2x para evolucionar más rápido
 - **Métricas avanzadas**: Fitness, distancia recorrida, tuberías pasadas, tiempo de supervivencia
 
@@ -145,15 +145,22 @@ Donde:
    ```
 
 2. **Selección**:
-   - **Elitismo**: Los mejores 20 individuos pasan directamente
+   - **Elitismo**: Los mejores 8 individuos pasan directamente
    - **Selección por ruleta**: Probabilidad proporcional al fitness
-
-3. **Crossover Blend**:
+   - **Selección por torneo**: Elección del mejor pajaro de un grupo aleatorio
+     
+3. **Crossover**:
+   - **Crossover Blend**
    ```python
    hijo1 = padre1 * α + padre2 * (1 - α)
    hijo2 = padre2 * α + padre1 * (1 - α)
    ```
-
+   - **Crossover un punto**:
+   ```python
+   hijo1 = padre1[:punto] + padre2[punto:]
+   hijo2 = padre1[punto:] + padre2[:punto]
+   ```
+   
 4. **Mutación adaptativa**:
    - Intensidad reducida para individuos con alto fitness
    - Tasa de mutación: 20% (configurable)
@@ -195,7 +202,7 @@ Donde:
 | **Default** | Tema clásico de Flappy Bird |
 | **AREA 51** | Temática espacial futurista con alien |
 | **Bajo agua** | Ambiente submarino |
-| **Bosque encantado** | Entorno con árboles y hadas! |
+| **Bosque encantado** | Entorno con árboles y hadas |
 | **Mitología** | Inspirado en mitología griega |
 | **Stranger things** | Estética de Stranger Things por la nueva temporada! |
 | **UdeSA** | Tema personalizado |
@@ -216,10 +223,12 @@ Donde:
 ```python
 NUM_PAJAROS = 100           # Tamaño de la población
 MAX_GENERATIONS = 100       # Generaciones máximas
+MAX_TIME = 120              # Segundos máximos para la generación
 ELITE_SIZE = 8              # Individuos élite preservados
 MUTATION_RATE = 0.2         # Tasa de mutación (20%)
 MUTATION_INTENSITY = 0.4    # Intensidad de la mutación
 BONUS_POR_TUBERIA = 300     # Puntos por tubería pasada
+
 ```
 
 ### Física del juego
@@ -288,7 +297,7 @@ Pygame es el **motor central del proyecto**. Renderiza sprites, procesa eventos,
 
 #### `Surface.convert_alpha()` - Convierte la imagen para permitir transparencia.
 
-#### `pygame.transform.scale(surface, (w,h))` - Escala imágenes (muy usado en tu juego para fondos, pájaros y tuberías).
+#### `pygame.transform.scale(surface, (w,h))` - Escala imágenes (muy usado en el juego para fondos, pájaros y tuberías).
 
 ---
 
@@ -300,10 +309,10 @@ Es una clase base que facilita la creación y manejo de objetos gráficos (sprit
 El proyecto usa **pygame.sprite.Sprite** para pájaros y tuberías para:
    * Colisiones automáticas
       - Pygame ofrece funciones como `pygame.sprite.spritecollide()` o `pygame.sprite.groupcollide()` que detectan choques entre sprites.
-      - Esto simplifica mucho la lógica de verificar si el pájaro toca una tubería.
+      - Esto simplifica mucho la lógica de verificar si el pájaro colisiona con una tubería.
    * Grupos de sprites
       - Se puede agrupar pájaros y tuberías en pygame.sprite.Group().
-      - Con un solo método (`group.update()` o `group.draw(surface)`) actualizas o dibujas todos los objetos, en lugar de hacerlo uno por uno.
+      - Con un solo método (`group.update()` o `group.draw(surface)`) se actualizan o dibujan todos los objetos, en lugar de hacerlo uno por uno.
 
 #### `class Pajaro(pygame.sprite.Sprite)` - Sprites con colisiones y física.
 
@@ -519,9 +528,9 @@ if generation == self.last_generation:
 ### Evolución típica
 
 - **Generación 1-5**: Pájaros mueren rápidamente, pocos pasan tuberías
-- **Generación 10-20**: Comienzan a aparecer estrategias básicas
-- **Generación 30-50**: Mejora significativa, pasan 5-10 tuberías
-- **Generación 70+**: Individuos élite pueden pasar 20+ tuberías
+- **Generación 10-20**: Mejora significativa, pasan 5-10 tuberías
+- **Generación 30-50**: Individuos élite pueden pasar 20+ tuberías
+- **Generación 70+**: Individuos élite pueden pasar 50+ tuberías
 
 ### Convergencia del genoma
 
@@ -538,7 +547,7 @@ Con el tiempo, los pesos genéticos convergen hacia valores óptimos:
 **Desarrolladores:**
 - Calvo, Bautista
 - Espoz, Rocío
-- Isla, Ivan
+- Isla, Iván
 - Ponce Albarracin, Adrian Santiago
 ---
 - Materia: Pensamiento Computacional
