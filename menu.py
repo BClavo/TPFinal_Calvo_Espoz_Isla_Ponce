@@ -305,7 +305,7 @@ class MenuPrincipal:
             self.mostrar_modo_juego = False
 
     def mostrar_configuracion(self) -> None:
-        """Muestra el menú de configuración (placeholder)."""
+        """Muestra el menú de configuración (placeholder)"""
         #no implementado
         print('Configuración: sonido, música, controles, etc')
 
