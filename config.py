@@ -70,7 +70,7 @@ BIRD_SIZE = 30
 
 NUM_PAJAROS = 100  # Tamaño de la población por generación
 MAX_GENERATIONS = 100  # Número máximo de generaciones en simulador
-ELITE_SIZE = 20  # Cantidad de individuos élite que pasan sin cambios
+ELITE_SIZE = 8  # Cantidad de individuos élite que pasan sin cambios
 MUTATION_RATE = 0.2  # Probabilidad de mutación por gen (20%)
 MUTATION_INTENSITY = 0.4  # Intensidad máxima de la mutación
 BONUS_POR_TUBERIA = 300  # Puntos de fitness por tubería pasada

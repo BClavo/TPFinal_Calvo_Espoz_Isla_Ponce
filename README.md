@@ -216,7 +216,7 @@ Donde:
 ```python
 NUM_PAJAROS = 100           # Tamaño de la población
 MAX_GENERATIONS = 100       # Generaciones máximas
-ELITE_SIZE = 20             # Individuos élite preservados
+ELITE_SIZE = 8              # Individuos élite preservados
 MUTATION_RATE = 0.2         # Tasa de mutación (20%)
 MUTATION_INTENSITY = 0.4    # Intensidad de la mutación
 BONUS_POR_TUBERIA = 300     # Puntos por tubería pasada

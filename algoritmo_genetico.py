@@ -279,7 +279,8 @@ class Poblacion:
             padre2: Pajaro = self.seleccion_por_ruleta()
 
             # Generar dos hijos mediante crossover blend
-            hijos: list[Pajaro] = self.crossover_blend(padre1, padre2)
+            # hijos: list[Pajaro] = self.crossover_blend(padre1, padre2)
+            hijos: list[Pajaro] = self.crossover_un_punto(padre1, padre2)
 
             # Procesar cada hijo
             for hijo in hijos:
