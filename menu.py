@@ -117,6 +117,7 @@ class BotonImagen:
         Returns:
             pygame.Surface: Imagen resaltada.
         """
+        #duplica la imagen y la pinta de blanco para resaltarla
         resaltado_img = imagen.copy()
         resaltado_img.fill((255, 255, 255, 50), None, pygame.BLEND_RGBA_ADD)
         return resaltado_img
@@ -154,6 +155,8 @@ class MenuPrincipal:
         self.running = True
         
         self.botones=True
+
+        #creacion y adecuacion al tamaño de botones y texto
         self.boton_play = BotonImagen(WIDTH // 4 - 110 , 440, SPRITE_PATHS['jugar'])
         self.boton_personalizar = BotonImagen(WIDTH // 2 - 110, 440, SPRITE_PATHS['personalizar'])
         self.boton_salir = BotonImagen(WIDTH*3 // 4 - 110, 440, SPRITE_PATHS['salir'])
@@ -193,25 +196,35 @@ class MenuPrincipal:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #si se hace click izquierdo
+                    #printea mensaje si se presiona la rueda
                     if self.rect_tuerca.collidepoint(mouse_pos):
                         self.sound_manager.play_sfx('click')
                         self.mostrar_configuracion()
-                    elif self.mostrar_confirmacion:
-                        self.gestionar_confirmacion(mouse_pos)
-                    elif self.mostrar_modo_juego:
-                        self.gestionar_modo(mouse_pos)
-                    elif self.mostrar_personalizacion:
-                        self.gestionar_personalizacion(mouse_pos)
-                    elif self.boton_play.click(mouse_pos):
-                        self.sound_manager.play_sfx('click')
-                        self.mostrar_modo_juego = True
-                    elif self.boton_personalizar.click(mouse_pos):
-                        self.sound_manager.play_sfx('click')
-                        self.mostrar_personalizacion=True
+                    #muestra el menu de confirmacion de salida si se presiona salir
                     elif self.boton_salir.click(mouse_pos):
                         self.sound_manager.play_sfx('click')
                         self.mostrar_confirmacion = True
+                    #gestiona la eleccion de salir o no si el menu está abierto
+                    elif self.mostrar_confirmacion:
+                        self.gestionar_confirmacion(mouse_pos)
+                    #muestra la seleccion de modo de juego si se presiona jugar
+                    elif self.boton_play.click(mouse_pos):
+                        self.sound_manager.play_sfx('click')
+                        self.mostrar_modo_juego = True
+                    #gestiona la seleccion del modo de juego si el menu está abierto
+                    elif self.mostrar_modo_juego:
+                        self.gestionar_modo(mouse_pos)
+                    #muestra el menu de personalizacion si se presiona personalizar
+                    elif self.boton_personalizar.click(mouse_pos):
+                        self.sound_manager.play_sfx('click')
+                        self.mostrar_personalizacion=True
+                    #gestiona la personalizacion si el menu está abierto
+                    elif self.mostrar_personalizacion:
+                        self.gestionar_personalizacion(mouse_pos)
+                    
+                    
+                    
 
             self.boton_play.actualizar(mouse_pos)
             self.boton_personalizar.actualizar(mouse_pos)
@@ -232,7 +245,8 @@ class MenuPrincipal:
             self.boton_personalizar.dibujar(self.pantalla)
             self.boton_salir.dibujar(self.pantalla)
             self.pantalla.blit(self.icono_tuerca, self.rect_tuerca)
-
+        
+        #dibuja el menu acorde al boton seleccionado
         if self.mostrar_confirmacion:
             self.dibujar_confirmacion()
         elif self.mostrar_modo_juego:
@@ -254,9 +268,11 @@ class MenuPrincipal:
 
     def gestionar_confirmacion(self, mouse_pos: tuple[int, int]) -> None:
         """Gestiona la elección del cuadro de confirmación."""
+        #corta si se elige salir del juego
         if self.boton_si.click(mouse_pos):
             self.sound_manager.play_sfx('click')
             self.running = False
+        #deja de mostrar el menu si se elige que no
         elif self.boton_no.click(mouse_pos):
             self.sound_manager.play_sfx('click')
             self.mostrar_confirmacion = False
@@ -275,11 +291,13 @@ class MenuPrincipal:
 
     def gestionar_modo(self, mouse_pos: tuple[int, int]) -> None:
         """Gestiona el click en la selección de modo."""
+        #inicia el juego en modo simulador y deja de mostrar el menu
         if self.boton_simulador.click(mouse_pos):
             self.sound_manager.play_sfx('click')
             juego = Juego(self.pantalla,estilo=self.estilo)
             juego.run()
             self.mostrar_modo_juego = False
+        #inicia el juego en modo clásico y deja de mostraar el menu
         elif self.boton_clasico.click(mouse_pos):
             self.sound_manager.play_sfx('click')
             juego = Juego(self.pantalla, "clasico",self.estilo)
@@ -288,30 +306,37 @@ class MenuPrincipal:
 
     def mostrar_configuracion(self) -> None:
         """Muestra el menú de configuración (placeholder)."""
+        #no implementado
         print('Configuración: sonido, música, controles, etc')
 
     def mostrar_estilos(self) -> None:
         """Muestra el menú de personalización"""
+        #mantiene el fondo pero quita los botones
         self.botones=False
+
+        #genera lista de tematicas para la seleccion
         self.lista_tematicas=["default","espacio","agua","bosque","mitologia","stranger","udesa"]
         self.indice=self.lista_tematicas.index(self.estilo)
         self.ind_medio=self.indice
         self.ind_izq=self.ind_medio-1 if self.ind_medio-1 in range(len(self.lista_tematicas)) else -1
         self.ind_der=self.ind_medio+1 if self.ind_medio+1 in range(len(self.lista_tematicas)) else 0
 
+        #oscurece el fondo
         fondo_negro = pygame.Surface((WIDTH, HEIGHT))   # crea superficie del tamaño de la pantalla
         fondo_negro.set_alpha(210)                      # ajusta transparencia (0=transparente, 255=opaco)
         fondo_negro.fill((0, 0, 0))                     # color negro
         self.pantalla.blit(fondo_negro, (0, 0))         # dibuja sobre la pantalla
 
-
-        self.boton_medio= BotonImagen(WIDTH//2-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_medio]]['portada'],(200,100))
-        self.boton_izq= BotonImagen(WIDTH//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_izq]]['portada'],(200,100))
-        self.boton_der= BotonImagen(WIDTH*3//4-100,100,SPRITE_PATHS[self.lista_tematicas[self.ind_der]]['portada'],(200,100))
+        #genera los botones de las portadas, flechas y seleccion
+        self.boton_medio= BotonImagen(WIDTH//2-120,90,SPRITE_PATHS[self.lista_tematicas[self.ind_medio]]['portada'],(240,120))
+        self.boton_izq= BotonImagen(WIDTH//4-90,105,SPRITE_PATHS[self.lista_tematicas[self.ind_izq]]['portada'],(180,90))
+        self.boton_der= BotonImagen(WIDTH*3//4-90,105,SPRITE_PATHS[self.lista_tematicas[self.ind_der]]['portada'],(180,90))
         self.flecha_izq= BotonImagen(50,125,SPRITE_PATHS["flechai"], (50,50))
         self.flecha_der= BotonImagen(WIDTH-100,125,SPRITE_PATHS["flechad"], (50,50))
         self.boton_elegir= Boton(WIDTH//2-110,HEIGHT-80,"Elegir",color_base=NARANJA)
+        ###se planeaba dar funcionalidad a las portadas, de ahí que se generen como botones
 
+        #muestra todos los elementos
         self.boton_medio.dibujar(self.pantalla)
         self.boton_izq.dibujar(self.pantalla)
         self.boton_der.dibujar(self.pantalla)
@@ -319,12 +344,14 @@ class MenuPrincipal:
         self.flecha_der.dibujar(self.pantalla)
         self.boton_elegir.dibujar(self.pantalla)
 
+        #se muestra el personaje, tuberías y fondo si el estilo no es el de udesa
         if self.estilo!="udesa":
+            #se genrra un borde blanco para resaltar el elemento respecto del fondo
             pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//2)-53, (HEIGHT//2-3),106,106),3)
             pygame.draw.rect(self.pantalla,BLANCO,((WIDTH//4)-13, (HEIGHT//2-3),26,126),3)
             pygame.draw.rect(self.pantalla,BLANCO,((WIDTH*3//4)-78, (HEIGHT//2-3),156,81),3)
 
-
+            #se adecuan los tamaños de las imagenes correspondientes al diccionario de estilos y se los muestra
             self.pj= pygame.image.load(SPRITE_PATHS[self.estilo]['bird']).convert()
             self.pj= pygame.transform.scale(self.pj, (100, 100))
             self.pipe= pygame.image.load(SPRITE_PATHS[self.estilo]['pipe_bottom']).convert()
@@ -343,7 +370,10 @@ class MenuPrincipal:
   
     def gestionar_personalizacion(self, mouse:tuple[int,int]):
         """Gestiona el click en la selección de personalizacion."""
+
         if self.flecha_izq.click(mouse):
+            #se redefine el estilo actual como el estilo de la izquierda
+            #esto modifica que estilo aporta el fondo actualmente y es definido como el nuevo medio
             self.sound_manager.play_sfx('click')
             self.estilo = self.lista_tematicas[self.ind_izq]
 
@@ -356,9 +386,12 @@ class MenuPrincipal:
             self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
 
         elif self.flecha_der.click(mouse):
+            #se redefine el estilo actual como el estilo de la derecha
+            #esto modifica que estilo aporta el fondo actualmente y es definido como el nuevo medio
             self.sound_manager.play_sfx('click')
             self.estilo = self.lista_tematicas[self.ind_der]
 
+            # Si es udesa → usar portada, si no → usar fondo
             if self.estilo == "udesa":
                 self.portada = pygame.image.load(SPRITE_PATHS[self.estilo]['portada']).convert()
             else:
@@ -366,6 +399,7 @@ class MenuPrincipal:
 
             self.portada = pygame.transform.scale(self.portada, (WIDTH, HEIGHT))
 
+        #si se elige el estilo se sale del menu de personalizacion y muestra nuevamente los botones del menu principal
         elif self.boton_elegir.click(mouse):
             self.sound_manager.play_sfx('click')
             self.mostrar_personalizacion = False
